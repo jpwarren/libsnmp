@@ -354,6 +354,12 @@ class Integer(Asn1Object):
             value = self.__class__(value)
         return self.__class__(self.value + integer.value)
 
+    def __hash__(self):
+        """ Standard Python integers are easy to hash
+            so we just do the same thing.
+        """
+        return self.value.__hash__()
+
     def encodeContents(self):
 
         ## We handle two special cases otherwise we handle positive
