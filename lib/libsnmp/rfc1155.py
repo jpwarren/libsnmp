@@ -163,31 +163,20 @@ class Asn1Object:
             
             (tag, stream) = self.decodeTag(stream)
             (length, stream) = self.decodeLength(stream)
-            
+
             objectData = stream[:length]
             stream = stream[length:]
             
             try:
                 decoder = tagDecodeDict[tag]()
-                
             except KeyError:
                 raise ValueError('Unknown ASN.1 Type %d' % (tag) )
             
-            log.debug('decoding a %s...' % decoder)
-            
             objects.append( decoder.decodeContents(objectData) )
-            
-            if __debug__:
-                if __debug__: log.debug('contents: %s' % objects)
-                for item in objects:
-                    if __debug__: log.debug('  item: %s' % item)
-                    pass
-                pass
-            
             pass
         
         return objects
-
+    
     def encodeContents(self):
 
         """encodeContents should be overridden by subclasses to encode
@@ -338,42 +327,46 @@ class Integer(Asn1Object):
         return self.__class__(self.value + integer.value)
 
     def encodeContents(self):
-        result = ''
 
-        integer = self.value
-        if __debug__: log.debug('Encoding Integer %d' % integer )
-        if integer == 0:
-            result = '\000'
-
-        elif integer == -1:
-            result = '\377'
-
-        elif integer > 0:
-            while integer != 0:
-                result = chr(integer & 0xff) + result
-                integer = integer >> 8
-                pass
-
-            if ord(result[0]) & 0x80:
-                result = chr(0x00) + result
-                pass
-            pass
+        ## We handle two special cases otherwise we handle positive
+        ## and negative numbers independently
         
-        else:
-            while integer != -1:
-                result = chr(integer & 0xff) + result
-                integer = integer>>8
+        integer = self.value
+        
+        if integer == 0:
+            return '\000'
+            
+        elif integer == -1:
+            return '\377'
+        
+        elif integer > 0:
+            result = []
+            while integer != 0:
+                result.insert(0, integer & 0xff)
+                integer >>= 8
                 pass
             
-            if ord(result[0]) & 0x80 != 0x80:
-                result = chr(0x00) + result
+            if result[0] & 0x80:
+                result.insert(0, 0)
                 pass
-            pass
+            
+            return ''.join(map(chr, result))
         
+        else:
+            result = []
+            while integer != -1:
+                result.insert(0, integer & 0xff)
+                integer >>= 8
+                pass
+            
+            if result[0] & 0x80 != 0x80:
+                result.insert(0, 0)
+                pass
+            
+            return ''.join(map(chr, result))
         
-        if __debug__: log.debug('Encoded Integer as: %s' % util.octetsToHex(result) )
-        
-        return result
+        pass
+    
     
     def decodeContents(self, stream):
         """ Decode some input octet stream into a signed ASN.1 integer
@@ -382,26 +375,27 @@ class Integer(Asn1Object):
         ## This method wins because it's consistently the fastest
         ##
         
+        input = map(ord, stream)
+        
         if __debug__: log.debug('Decoding %s' % util.octetsToHex(stream) )
+        
         self.value = 0L
-        byte = ord(stream[0])
+        byte = input[0]
         if (byte & 0x80) == 0x80:
             negbit = 0x80L
             self.value = byte & 0x7f
             
-            for i in range(len(stream)-1):
-                byte = ord(stream[i+1])
+            for i in xrange(1, len(input)):
                 negbit <<= 8
-                self.value = (self.value << 8) | byte
+                self.value = (self.value << 8) | input[i]
                 pass
             
             self.value = self.value - negbit
             
         else:
             self.value = long(byte)
-            for i in range(len(stream)-1):
-                byte = ord(stream[i+1])
-                self.value = (self.value<<8) | byte
+            for i in xrange(1,len(input)):
+                self.value = (self.value << 8) | input[i]
                 pass
             pass
         
@@ -410,7 +404,7 @@ class Integer(Asn1Object):
         return self
     
     def decodeTwosInteger1(self, stream):
-
+        
         """ One algorithm for decoding twos complement Integers """
         
         ##
@@ -547,7 +541,7 @@ class ObjectID(Asn1Object):
                 self.value.append(number)
                 pass
             pass
-        
+            
         elif type(value) == types.ListType or type(value) == types.NoneType:
             self.value = value
             
@@ -605,22 +599,19 @@ class ObjectID(Asn1Object):
         subid1 = (idlist.pop() * 40) + idlist.pop()
         idlist.reverse()
         idlist.insert(0, subid1)
-
-        # encode each subid
+        
         for subid in idlist:
             if subid < 128:
-                result.append('%c' % (subid & 0x7f) )
+                result.append(chr(subid & 0x7f))
             else:
-                res = []
-                res.append( '%c' % (subid & 0x7f) )
+                position = len(result)
+                result.append(chr(subid & 0x7f))
                 
                 subid = subid >> 7
                 while subid > 0:
-                    res.insert( 0, '%c' % (0x80 | (subid & 0x7f)) )
+                    result.insert(position, chr(0x80 | (subid & 0x7f)))
                     subid = subid >> 7
                     pass
-                
-                result += res
                 pass
             pass
         
@@ -674,8 +665,7 @@ class ObjectID(Asn1Object):
             ## afterwards, up until bit 8 isn't set.
             ##
             if subid & 0x80 == 0x80:
-                val = 0
-                val = (val << 7) | (subid & 0x7f)
+                val = subid & 0x7f
                 while (subid & 0x80) == 0x80:
                     subid = bytes[n]
                     n += 1

@@ -21,7 +21,7 @@ from libsnmp import debug
 from libsnmp import rfc1155
 
 # The number of objects to encode/decode in one go.
-NUMBER_OF_OBJECTS = 10000
+NUMBER_OF_OBJECTS = 50000
 
 log = logging.getLogger('SVT Encoder Test')
 log.setLevel(logging.DEBUG)
@@ -74,6 +74,11 @@ def encodeDecodeRandomObjectIDs():
         pass
     pass
 
+def go():
+    encodeDecodeRandomObjectIDs()
+    encodeDecodeRandomIntegers()
+    pass
+
 if __name__ == '__main__':
     
     #    print "Profiling encoding %d random integers..." % NUMBER_OF_OBJECTS
@@ -86,7 +91,8 @@ if __name__ == '__main__':
     #    profile.run('encodeRandomObjectIDs()')
     
     print "Profiling encoding/decoding of %d random ObjectIDs..." % NUMBER_OF_OBJECTS
-    profile.run('encodeDecodeRandomObjectIDs()')
+    profile.run('go()')
+    
     #encodeDecodeRandomObjectIDs()  
     
     end = time.time()
