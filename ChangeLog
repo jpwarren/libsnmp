@@ -1,3 +1,7 @@
+2003-09-21  Justin Warren <justin.warren@unicity.com.au>
+
+    - Added licensing information to release under LGPL.
+
 2003-09-19  Jim Crumpler  <jgc@pringle.jgc.unicity.com.au>
 
 	* lib/libsnmp/rfc1155.py (OctetString.decodeContents): changed all
@@ -11,7 +15,7 @@
 	* lib/libsnmp/rfc1155.py (Asn1Object.decode): move the tag and
 	length portions of decode() to decodeTag() and decodeLength()
 
-0.0.1     2003-08-13  Justin Warren <daedalus@eigenmagic.com>
+0.0.1     2003-08-13  Justin Warren <justin.warren@unicity.com.au>
 
-    - First version of libsnmp
+    - First version of libsnmp added to CVS
 

@@ -1,14 +1,28 @@
 # $Id$
-# Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
-# All Rights Reserved
+# $Revision$
+#
+#    libsnmp - a Python SNMP library
+#    Copyright (C) 2003 Unicity Pty Ltd <libsnmp@unicity.com.au>
+#
+#    This library is free software; you can redistribute it and/or
+#    modify it under the terms of the GNU Lesser General Public
+#    License as published by the Free Software Foundation; either
+#    version 2.1 of the License, or (at your option) any later version.
+#
+#    This library is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    Lesser General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public
+#    License along with this library; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 # This file contains all the base types for SNMP with the abstract
 # ASN1 stuff removed and a 'hardcoded' definition used instead.  This
 # means we don't use an abstract ASN.1 library to figure out what
 # stuff is, which is faster for something that is a dedicated
 # application of ASN.1, like SNMP.
-#
-# This file is designed to be a drop in replacement for pysnmp code
 
 import util
 import debug

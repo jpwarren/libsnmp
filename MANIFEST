@@ -1,3 +1,7 @@
+COPYRIGHT
+LICENSE
+INSTALL
+ChangeLog
 setup.py
 snmpget.py
 snmpwalk.py
