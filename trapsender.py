@@ -51,7 +51,7 @@ def whenDone(snmpClient):
         time.sleep(microsleep)
     lasttime = time.time()
 
-    varbind = rfc1157.VarBind( rfc1155.ObjectID(stringval='.1.3.6.1.4.5.6.7'), rfc1155.OctetString( time.strftime('%a %d %b %Y %H:%M:%S') ) )
+    varbind = rfc1157.VarBind( rfc1155.ObjectID('.1.3.6.1.4.5.6.7'), rfc1155.OctetString( time.strftime('%a %d %b %Y %H:%M:%S') ) )
 #    print 'varbind: %s' % varbind
 
     varbindlist = rfc1157.VarBindList( [ varbind ] )
@@ -60,7 +60,9 @@ def whenDone(snmpClient):
     trapPDU = snmpClient.createTrapPDU( varbindlist )
 #    print('pdu: %s' % trapPDU)
 
-    snmpClient.snmpTrap( ('localhost', 162), trapPDU )
+## Send to SNMP port. We use a different port number for testing.
+    print "sending trap..."
+    snmpClient.snmpTrap( ('localhost', 9999), trapPDU )
 
 # Main bits
 

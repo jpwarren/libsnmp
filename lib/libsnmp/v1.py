@@ -40,7 +40,7 @@ class SNMP(asynrole.manager):
 
     nextRequestID = 0L      # global counter of requestIDs
 
-    def __init__(self, queueEmpty=None, trapCallback=None, interface=('0.0.0.0', 0), timeout=0.25):
+    def __init__(self, interface=('0.0.0.0', 0), queueEmpty=None, trapCallback=None, timeout=0.25):
         """ Create a new SNMPv1 object bound to localaddr
             where localaddr is an address tuple of the form
             ('server', port)
@@ -111,7 +111,7 @@ class SNMP(asynrole.manager):
         """
         ent = ObjectID(enterprise)
         if not agentAddr:
-            agentAddr = self.sock.getsockname()[0]
+            agentAddr = self.getsockname()[0]
         agent = NetworkAddress(agentAddr)
         gTrap = GenericTrap(genericTrap)
         sTrap = Integer(specificTrap)
@@ -199,7 +199,7 @@ class SNMP(asynrole.manager):
 
             # Decode it based on what version of message it is
             if msg.version == 0:
-                log.debug('Detected SNMPv1 message')
+                if __debug__: log.debug('Detected SNMPv1 message')
 
             else:
                 log.error('Unknown message version %d detected' % msg.version)
@@ -219,14 +219,13 @@ class SNMP(asynrole.manager):
                 self.trapCallback(self, msg)
 
             else:
-                log.debug('Unknown message type')
+                if __debug__: log.debug('Unknown message type')
 
         # log any errors in callback
         except Exception, e:
 #            log.error('Exception in callback: %s: %s' % (self.callbacks[int(msg.data.requestID)].__name__, e) )
             log.error('Exception in receiveData: %s' % e )
             raise
-
 
     def enterpriseOID(self, partialOID):
         """ A convenience method to automagically prepend the
@@ -238,22 +237,21 @@ class SNMP(asynrole.manager):
         """ Listen for incoming request thingies
             and send pending requests
         """
-        while 1:
+        while True:
             try:
                 # send any pending outbound messages
                 request = self.outbound.get(0)
                 self.send( request[0].encode(), request[1] )
 
-                # check for inbound messages
-                self.poll()
-
             except Queue.Empty:
-                if self.queueEmpty:
+                if self.queueEmpty is not None:
                     self.queueEmpty(self)
                 pass
 
-            except:
-                raise
+                # check for inbound messages
+                self.poll()
+
+                time.sleep(0.1)
 
     def getSysUptime(self):
         """ This is a pain because of system dependence

@@ -23,8 +23,8 @@ from distutils.core import setup
 
 import time
 
-version_major = 0
-version_minor = 2
+version_major = 1
+version_minor = 0
 version_build = 1
 version_devel=''
 #version_devel='-dev-' + time.strftime('%Y-%m-%d-%H%M')

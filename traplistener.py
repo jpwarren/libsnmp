@@ -26,7 +26,7 @@ import select
 import getopt
 
 import sys
-sys.path.append('lib')
+
 from libsnmp import debug
 from libsnmp import util
 from libsnmp import rfc1155
@@ -58,7 +58,7 @@ def whenDone(snmpClient):
 # Read command line
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
-# Probably replace with something that assigns a random port
+# Listen on SNMP trap port
 myClient = v1.SNMP( ('localhost', 9999), trapCallback=checkResponse )
 
 #if len(args) != 3:
