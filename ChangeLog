@@ -1,6 +1,10 @@
-2003-09-21  Justin Warren <justin.warren@unicity.com.au>
+2003-10-26  Justin Warren <justin.warren@unicity.com.au>
+	* Added SNMPv2 support and fixed compatibility bugs caused
+	by ucd-snmp returning Context Specific tags.
 
-    - Added licensing information to release under LGPL.
+2003-09-21  Justin Warren <justin.warren@unicity.com.au>
+    
+	* Added licensing information to release under LGPL.
 
 2003-09-19  Jim Crumpler  <jgc@pringle.jgc.unicity.com.au>
 
@@ -17,5 +21,5 @@
 
 0.0.1     2003-08-13  Justin Warren <justin.warren@unicity.com.au>
 
-    - First version of libsnmp added to CVS
+        * First version of libsnmp added to CVS
 
