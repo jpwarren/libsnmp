@@ -32,7 +32,7 @@ from libsnmp import util
 from libsnmp import rfc1155
 from libsnmp import rfc1157
 
-from libsnmp import v1
+from libsnmp import snmpmanager
 
 def checkResponse(snmpClient, msg):
     """ Quick and dirty print of what the message contains
@@ -52,16 +52,6 @@ def unwrapVarBinds(varBindList):
 #    print '%s' % varBindList[0].objectValue
     print '%s = %s: (%s) %s' % ( varBindList[0].objectID, varBindList[0].objectValue.__class__.__name__, varBindList[0].objectValue, varBindList[0].objectValue )
 
-def getData():
-    (inlist, outlist, errlist) = select.select( [sock], [], [] )
-    if inlist:
-        data = sock.recv(8096)
-    #    log.debug('got data: %s' % util.octetsToHex(data) )
-        msg = rfc1157.Message().decode(data)
-    #    log.debug('message recvd: %s' % msg)
-
-        checkResponse(msg)
-
 # What to do when we finish
 def whenDone(snmpClient):
     sys.exit(0)
@@ -74,7 +64,7 @@ def whenDone(snmpClient):
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
 # Probably replace with something that assigns a random port
-myClient = v1.SNMP( whenDone )
+myClient = snmpmanager.snmpManager( whenDone )
 
 #remotesite = ( 'localhost', 161 )
 #myClient.snmpGet('.1.3.6.1.2.1.1.1.0', remotesite, checkResponse)

@@ -114,7 +114,7 @@ class Asn1Object:
 
         """Decode a BER tag field, returning the tag and the remainder
         of the stream"""
-        
+
         tag = ord(stream[0])
         n = 1
         if tag & 0x1F == 0x1F:
@@ -132,7 +132,7 @@ class Asn1Object:
                 if not byte & 0x80: break
                 pass
             pass
-        
+
         return tag, stream[n:]
     
     ##
@@ -170,7 +170,7 @@ class Asn1Object:
         of a stream of octets and uses the appropriate decode() method
         of that known object.  Attempts to decode() an unknown object
         type result in an error.  """
-        
+
         if type(stream) != types.StringType:
             raise TypeError('stream should be of type StringType, not %s' % type(stream) )
         
@@ -333,7 +333,6 @@ class Integer(Asn1Object):
     # Define some handy arithmetic operations
     def __eq__(self, other):
         try:
-            log.debug('checking out %s' % other)
             if self.value == long(other):
                 return True
 

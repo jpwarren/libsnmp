@@ -23,8 +23,8 @@
 import logging
 import debug
 
-from rfc1902 import *
 import rfc1157
+from rfc1902 import *
 
 log = logging.getLogger('rfc1905')
 
@@ -34,6 +34,28 @@ asnTagNumbers['TrapV2'] = 0x07
 asnTagNumbers['Report'] = 0x08
 
 max_bindings = 2147483647L
+
+class VarBind(rfc1157.VarBind):
+    """ VarBind redefined here to place it in the same namespace
+    """
+    pass
+
+## We need to add some special types because ucd-snmp uses
+## context specific values for the CHOICE within a VarBind
+class NoSuchObject(rfc1157.Null):
+
+    def __str__(self):
+        return('No Such Object')
+
+class NoSuchInstance(rfc1157.Null):
+
+    def __str__(self):
+        return('No Such Instance')
+
+class EndOfMibView(rfc1157.Null):
+
+    def __str__(self):
+        return('EndOfMibView')
 
 class VarBindList(rfc1157.VarBindList):
     """ An SNMPv2 VarBindList has a maximum size of max_bindings
@@ -158,12 +180,12 @@ class BulkPDU(Sequence):
 
         return self.__class__( int(objectList[0]), int(objectList[1]), int(objectList[2]), myVarList)
 
-class GetRequest(PDU):
+class Get(PDU):
     """ An SNMPv2 Get Request PDU
     """
     asnTagNumber = asnTagNumbers['Get']
 
-class GetNextRequest(PDU):
+class GetNext(PDU):
     """ An SNMPv2 Get Next Request PDU
     """
     asnTagNumber = asnTagNumbers['GetNext']
@@ -173,7 +195,7 @@ class Response(PDU):
     """
     asnTagNumber = asnTagNumbers['Response']
 
-class SetRequest(PDU):
+class Set(PDU):
     """ An SNMPv2 Set Request PDU
     """
     asnTagNumber = asnTagNumbers['Set']
@@ -209,3 +231,8 @@ tagDecodeDict[0xa5] = GetBulk
 tagDecodeDict[0xa6] = Inform
 tagDecodeDict[0xa7] = TrapV2
 tagDecodeDict[0xa8] = Report
+
+## ucd-snmp returns context-specific values at time
+tagDecodeDict[0x80] = NoSuchObject
+tagDecodeDict[0x81] = NoSuchInstance
+tagDecodeDict[0x82] = EndOfMibView

@@ -28,6 +28,8 @@ import logging
 #import os
 #import asyncore
 
+import traceback
+
 from libsnmp import debug
 from libsnmp import rfc1155
 from libsnmp import rfc1157
@@ -36,19 +38,18 @@ from libsnmp import rfc1905
 #from libsnmp import asynrole
 
 from libsnmp import v1
-
 log = logging.getLogger('v2.SNMP')
 
 class SNMP(v1.SNMP):
 
     def createGetRequestPDU(self, varbindlist):
         reqID = self.assignRequestID()
-        pdu = rfc1905.GetRequest( reqID, varBindList=varbindlist )
+        pdu = rfc1905.Get( reqID, varBindList=varbindlist )
         return pdu
 
     def createGetNextRequestPDU(self, varbindlist):
         reqID = self.assignRequestID()
-        pdu = rfc1905.GetNextRequest( reqID, varBindList=varbindlist )
+        pdu = rfc1905.GetNext( reqID, varBindList=varbindlist )
         return pdu
 
     def createGetRequestMessage(self, oid, community='public'):
@@ -96,7 +97,7 @@ class SNMP(v1.SNMP):
             oid is a dotted string eg: .1.2.6.1.0.1.1.3.0
         """
         msg = self.createGetRequestMessage( oid, community )
-        log.debug('sending message: %s' % msg)
+        # log.debug('sending message: %s' % msg)
 
         # add this message to the outbound queue as a tuple
         self.outbound.put( (msg, remote) )
@@ -197,4 +198,5 @@ class SNMP(v1.SNMP):
         except Exception, e:
 #            log.error('Exception in callback: %s: %s' % (self.callbacks[int(msg.data.requestID)].__name__, e) )
             log.error('Exception in receiveData: %s' % e )
-            raise
+            traceback.print_exc()
+            #raise
