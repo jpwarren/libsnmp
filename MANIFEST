@@ -9,6 +9,8 @@ lib/libsnmp/rfc1155.py
 lib/libsnmp/rfc1157.py
 lib/libsnmp/util.py
 lib/libsnmp/v1.py
+lib/libsnmp/role.py
+lib/libsnmp/asynrole.py
 test/test_Messages.py
 test/test_encoder.py
 test/test_rfc1157.py

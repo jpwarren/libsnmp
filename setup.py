@@ -9,7 +9,7 @@ import time
 version_major = 0
 version_minor = 0
 version_build = 1
-version_devel = time.strftime('%Y%m%d%H%M')
+version_devel = time.strftime('%Y-%m-%d%-H%M')
 
 version = '%d.%d.%d' % ( version_major, version_minor, version_build )
 if version_devel:
