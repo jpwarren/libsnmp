@@ -38,6 +38,20 @@ from libsnmp import rfc1905
 
 log = logging.getLogger('snmp-manager')
 
+## Used in typeSetter()
+## Demo only, really
+typeValDict = {
+    'i': 0x02,  ## Integer
+    's': 0x04,  ## String
+    'o': 0x06,  ## ObjectID
+    't': 0x43,  ## TimeTicks
+    'a': 0x40,  ## IPAddress
+
+    'c': 0x41,  ## Counter
+    'C': 0x46,  ## Counter64
+    
+    }
+
 class snmpManager(asynrole.manager):
 
     nextRequestID = 0L      # global counter of requestIDs
@@ -94,6 +108,17 @@ class snmpManager(asynrole.manager):
             
         return pdu
 
+    def createSetRequestPDU(self, varbindlist, version=2):
+        reqID = self.assignRequestID()
+
+        if version == 1:
+            pdu = rfc1157.Set( reqID, varBindList=varbindlist )
+
+        elif version == 2:
+            pdu = rfc1905.Set( reqID, varBindList=varbindlist )            
+            
+        return pdu
+
     def createGetRequestMessage(self, oid, community='public', version=2):
         """ Creates a message object from a pdu and a
             community string.
@@ -128,6 +153,29 @@ class snmpManager(asynrole.manager):
 
         if version == 2:
             return rfc1905.Message( community=community, data=pdu )
+
+    def createSetRequestMessage(self, oid, valtype, value, community='public', version=2):
+        """ Creates a message object from a pdu and a
+            community string.
+        """
+        if version == 1:
+            objID = rfc1157.ObjectID(oid)
+            val = rfc1157.tagDecodeDict[valtype](value)
+            varbindlist = rfc1157.VarBindList( [ rfc1157.VarBind(objID, val) ] )
+            pdu = self.createSetRequestPDU( varbindlist, 1 )
+            message = rfc1157.Message( community=community, data=pdu )
+
+        elif version == 2:
+            objID = rfc1905.ObjectID(oid)
+            val = rfc1905.tagDecodeDict[valtype](value)
+            varbindlist = rfc1905.VarBindList( [ rfc1905.VarBind(objID, val) ] )
+            pdu = self.createSetRequestPDU( varbindlist, 1 )
+            message = rfc1905.Message( community=community, data=pdu )
+
+        else:
+            raise ValueError('Unknown version %d' % version)
+
+        return message
 
     def createTrapMessage(self, pdu, community='public'):
         """ Creates a message object from a pdu and a
@@ -182,21 +230,15 @@ class snmpManager(asynrole.manager):
         self.callbacks[msg.data.requestID] = callback
         return msg.data.requestID
 
-    def snmpSet(self, varbindlist, remote, callback, community='public', version=2):
-        """ An snmpSet requires a bit more up front smarts, in that
-            you need to pass in a varbindlist of matching OIDs and
-            values so that the value type matches that expected for the
-            OID. This library does not care about any of that stuff.
-
+    def snmpSet(self, oid, valtype, value, remote, callback, community='public', version=2):
         """
-        reqID = self.assignRequestID()
-        if version == 1:
-            pdu = v1.Set( reqID, varBindList=varbindlist )
-            msg = v1.Message( community=community, data=pdu )
-
-        if version == 2:
-            pdu = v2.Set( reqID, varBindList=varbindlist )
-            msg = v2.Message( community=community, data=pdu )
+        snmpSet is slightly more complex in that you need to pass in
+        a combination of oid and value in order to set a variable.
+        Depending on the version, this will be built into the appropriate
+        varbindlist for message creation.
+        valtype should be a tagDecodeDict key
+        """
+        msg = self.createSetRequestMessage( oid, valtype, value, community, version )
 
         # add this message to the outbound queue as a tuple
         self.outbound.put( (msg, remote) )
@@ -212,10 +254,6 @@ class snmpManager(asynrole.manager):
 
         self.outbound.put( (msg, remote) )
 
-    def createSetRequestMessage(self, varBindList, community='public'):
-        """ Creates a message object from a pdu and a
-            community string.
-        """
 
     def receiveData(self, manager, cb_ctx, (data, src), (exc_type, exc_value, exc_traceback) ):
         """ This method should be called when data is received
@@ -236,11 +274,11 @@ class snmpManager(asynrole.manager):
 
             # Decode it based on what version of message it is
             if msg.version == 0:
-                log.debug('Detected SNMPv1 message')
+                if __debug__: log.debug('Detected SNMPv1 message')
                 self.handleV1Message(msg)
 
             elif msg.version == 1:
-                log.debug('Detected SNMPv2 message')
+                if __debug__: log.debug('Detected SNMPv2 message')
                 self.handleV2Message(msg)
 
             else:
@@ -328,3 +366,12 @@ class snmpManager(asynrole.manager):
 
         except:
             return 0
+
+    def typeSetter(self, typestring):
+        """
+        Used to figure out the right tag value key to use in
+        snmpSet. This is really only used for a more user-friendly
+        way of doing things from a frontend. Use the actual key
+        values if you're calling snmpSet programmatically.
+        """
+        return typeValDict[typestring]

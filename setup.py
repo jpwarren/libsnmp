@@ -24,10 +24,10 @@ from distutils.core import setup
 import time
 
 version_major = 0
-version_minor = 0
+version_minor = 1
 version_build = 1
 version_devel=''
-version_devel='-dev-' + time.strftime('%Y-%m-%d-%H%M')
+#version_devel='-dev-' + time.strftime('%Y-%m-%d-%H%M')
 
 version='%d.%d.%d%s' % (version_major, version_minor, version_build, version_devel)
 
@@ -43,7 +43,8 @@ setup(
     package_dir = { '':'lib'},
     
     scripts = ['snmpget.py', 
-               'snmpwalk.py', 
+               'snmpwalk.py',
+               'snmpset.py',
                'traplistener.py', 
                'trapsender.py',
                ],

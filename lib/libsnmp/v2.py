@@ -40,6 +40,8 @@ from libsnmp import rfc1905
 from libsnmp import v1
 log = logging.getLogger('v2.SNMP')
 
+log.setLevel(logging.INFO)
+
 class SNMP(v1.SNMP):
 
     def createGetRequestPDU(self, varbindlist):
@@ -169,10 +171,10 @@ class SNMP(v1.SNMP):
 
             # Decode it based on what version of message it is
             if msg.version == 0:
-                log.debug('Detected SNMPv1 message')
+                if __debug__: log.debug('Detected SNMPv1 message')
 
             elif msg.version == 1:
-                log.debug('Detected SNMPv2 message')
+                if __debug__: log.debug('Detected SNMPv2 message')
 
             else:
                 log.error('Unknown message version %d detected' % msg.version)

@@ -34,6 +34,7 @@ from libsnmp import asynrole
 from libsnmp.rfc1157 import *
 
 log = logging.getLogger('v1.SNMP')
+log.setLevel(logging.INFO)
 
 class SNMP(asynrole.manager):
 
@@ -78,7 +79,7 @@ class SNMP(asynrole.manager):
 
     def createGetNextRequestPDU(self, varbindlist):
         reqID = self.assignRequestID()
-        pdu = GetNextRequestPDU( reqID, varBindList=varbindlist )
+        pdu = GetNext( reqID, varBindList=varbindlist )
         return pdu
 
     def createGetRequestMessage(self, oid, community='public'):

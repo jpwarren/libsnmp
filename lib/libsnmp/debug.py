@@ -28,7 +28,7 @@ class snmpLogger(logging.Logger):
     def __init__(self, name):
         pid = os.getpid()
 
-        FORMAT = "%(asctime)s [" + str(pid) + "] %(levelname)7s - %(message)s"
+        FORMAT = "%(asctime)s [" + str(pid) + "] %(name)s: %(levelname)s - %(message)s"
         level = logging.DEBUG
         logging.Logger.__init__(self, name, level)
 

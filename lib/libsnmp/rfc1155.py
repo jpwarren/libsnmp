@@ -590,7 +590,8 @@ class ObjectID(Asn1Object):
     def __str__(self):
 
         if self.value is not None:
-            return '.'.join( [str(x) for x in self.value] )
+            # Prepend a leading '.' to the OID string
+            return '.' + '.'.join( [str(x) for x in self.value] )
         else:
             return ''
         pass
