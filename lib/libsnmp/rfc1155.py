@@ -107,11 +107,11 @@ class Asn1Object:
                 tag = ord(stream[0])
                 if __debug__: log.debug('tag: 0x%02x' % tag)
                 n += 1
-
+                
                 ##
                 ## Consider the rare case of multi-byte tags.
                 ##
-
+                
                 if tag & 0x1f == 0x1f:
                     if __debug__: log.info('Multi-octet ID encoding detected')
                     subid = ord(stream[n])
@@ -119,7 +119,7 @@ class Asn1Object:
                         n += 1
                         (tag, subid) = (tag<<8) | subid, ord(stream[n])
                         pass
-
+                    
                     if __debug__: log.info(' multibyte tag: 0x02x' % tag)
                     pass
                 stream = stream[n:]
@@ -149,28 +149,28 @@ class Asn1Object:
             # deciding method for the object type.
             objectData = stream[:length]
             stream = stream[length:]
-
+            
             # Lookup the classname in the decoding dictionary
             try:
                 classType = tagDecodeDict[tag]
             except KeyError:
                 raise ValueError('Unknown ASN.1 Type %d' % (tag) )
-
+            
             decoder = classType()
-
+            
             log.debug('decoding a %s...' % decoder)
 
             objects.append( decoder.decodeContents(objectData) )
-
+            
             if __debug__:
                 if __debug__: log.debug('contents: %s' % objects)
                 for item in objects:
                     if __debug__: log.debug('  item: %s' % item)
                     pass
                 pass
-
+            
             pass
-
+        
         return objects
 
     def encodeContents(self):
@@ -255,7 +255,7 @@ class Asn1Object:
         
         """Compare two instance by comparison of their value fields
         only"""
-
+        
         return isinstance(other, self.__class__) and self.value == other.value
     
     ##
@@ -265,15 +265,6 @@ class Asn1Object:
         """Compare two objects for inequality"""
         
         return not (self == other)
-    
-    ##
-    ##
-    def __len__(self):
-        
-        """Return the length of the value field"""
-        
-        return len(self.value)
-    
     pass
 
 class Integer(Asn1Object):
@@ -500,24 +491,23 @@ class ObjectID(Asn1Object):
     asnTagNumber = asnTagNumbers['ObjectID']
 
     def __init__(self, value=None):
-        """ value is a list of subids
-            stringval is a ObjectID is dotted notation in leading
-            dot form, eg: .1.3.6.1.2.1.1.1.0
-        """ 
+        
+        """Create an ObjectID - value is a list of subids as a string
+        or list"""
+        
         Asn1Object.__init__(self)
-
+        
         if type(value) == types.StringType:
             
-            vals = value.split('.')
-            if vals[0] != '':
-                raise ValueError('ObjectID string must be in leading dot form')
+            value = value.lstrip('.')
+            subidlist = value.split('.')
             self.value = []
-            # ignore the first item due to leading dot form
-            for item in vals[1:]:
-                val = int(item)
-                if val < 0:
-                    raise ValueError("SubIDs cannot be negative")
-                self.value.append( val )
+            
+            for subid in subidlist:
+                val = int(subid)
+                if val < 0 or val > 0x7FFFFFFF:
+                    raise ValueError("SubID our of range")
+                self.value.append(val)
                 pass
             pass
         elif type(value) == types.ListType or type(value) == types.NoneType:
@@ -533,6 +523,16 @@ class ObjectID(Asn1Object):
             return '.'.join( [str(x) for x in self.value] )
         else:
             return ''
+        pass
+    
+    def __len__(self):
+        
+        """Return the length of the value field"""
+        
+        if self.value is None:
+            return 0
+        else:
+            return len(self.value)
         pass
     
     def isPrefixOf(self, other):
@@ -583,10 +583,10 @@ class ObjectID(Asn1Object):
             pass
         
         return ''.join(result)
-
+    
     def decodeContents(self, stream):
         self.value = []
-
+        
         bytes = map(ord, stream)
 
         if len(stream) == 0:
@@ -632,11 +632,15 @@ class ObjectID(Asn1Object):
                     subid = bytes[n]
                     n += 1
                     val = (val << 7) | (subid & 0x7f)
+                    pass
                 self.value.append(val)
             else:
                 self.value.append(subid)
-
+                pass
+            pass
+        
         return self
+    pass
 
 class Null(Asn1Object):
     """ An ASN.1 Object Identifier type
