@@ -1,3 +1,9 @@
+2004-12-21  Jim Crumpler  <jgc@slug.jgc.unicity.com.au>
+
+	* lib/libsnmp/rfc1155.py (ObjectID.__getitem__): supported
+	sequence style functions on ObjectIDs - you can now slice and
+	index.
+
 2003-10-26  Justin Warren <justin.warren@unicity.com.au>
 	* Added SNMPv2 support and fixed compatibility bugs caused
 	by ucd-snmp returning Context Specific tags.

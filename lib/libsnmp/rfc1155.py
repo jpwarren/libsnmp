@@ -564,7 +564,7 @@ class ObjectID(Asn1Object):
         
         if type(value) == types.StringType:
             
-            value = value.lstrip('.')
+            value = value.strip('.')
             subidlist = value.split('.')
             self.value = []
             
@@ -581,6 +581,9 @@ class ObjectID(Asn1Object):
             
         elif type(value) == types.TupleType:
             self.value = list(value)
+            
+        elif type(value) == types.IntType:
+            self.value = [value]
             
         else:
             raise TypeError('unknown type passed as OID')
@@ -605,6 +608,32 @@ class ObjectID(Asn1Object):
         else:
             return len(self.value)
         pass
+    
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.value.__getitem__(key)
+        else:
+            return ObjectID(self.value.__getitem__(key))
+        pass
+    
+    def __delitem__(self, key):
+        self.value.__delitem__(key)
+        return
+    
+    def append(self, subid):
+        if type(subid) == types.IntType:
+            self.value.append(subid)
+        else:
+            raise TypeError
+        return 
+    
+    def extend(self, other):
+        if isinstance(other, self.__class__):
+            self.value.extend(other.value)
+        else:
+            self.value.extend(other)
+            pass
+        return None
     
     def isPrefixOf(self, other):
 
