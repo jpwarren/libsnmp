@@ -14,7 +14,7 @@ version_devel = time.strftime('%Y-%m-%d%-H%M')
 version = '%d.%d.%d' % ( version_major, version_minor, version_build )
 if version_devel:
     version = version + '-%s' % version_devel
-
+    pass
 
 setup(
     name='libsnmp',
@@ -26,11 +26,10 @@ setup(
     url='http://www.unicity.com.au/',
     packages=['libsnmp'],
     package_dir = { '':'lib'},
-
-    scripts = [ 'snmpget.py', 
-        'snmpwalk.py', 
-        'traplistener.py', 
-        'trapsender.py',
-        ],
-
-)
+    
+    scripts = ['snmpget.py', 
+               'snmpwalk.py', 
+               'traplistener.py', 
+               'trapsender.py',
+               ],
+    )

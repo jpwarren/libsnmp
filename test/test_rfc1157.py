@@ -30,7 +30,7 @@ class rfc1157Test(unittest.TestCase):
     def test_varBindEncode(self):
         """ Test encode/decode of a VarBind
         """
-        myobj = rfc1157.VarBind( rfc1155.ObjectID(stringval='1.0.3.4.5.7'), rfc1155.Integer(47) )
+        myobj = rfc1157.VarBind( rfc1155.ObjectID('.1.0.3.4.5.7'), rfc1155.Integer(47) )
 #        self.log.debug('object: %s' % myobj)
         octets = myobj.encode()
 #        self.log.debug('octets: %s' % util.octetsToHex(octets) )
@@ -43,10 +43,10 @@ class rfc1157Test(unittest.TestCase):
         """ Test encode/decode of a VarBindList
         """
         myList = []
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.0.3.4.5.7'), rfc1155.Integer(47) ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.4.5.4.55.4465.7'), rfc1155.Null() ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.2.5.8.6858.7'), 
-                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress(stringval='10.232.8.6') ]) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.0.3.4.5.7'), rfc1155.Integer(47) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.4.5.4.55.4465.7'), rfc1155.Null() ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.2.5.8.6858.7'), 
+                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
 #        self.log.debug('mylist: %s' % myList)
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
@@ -58,10 +58,10 @@ class rfc1157Test(unittest.TestCase):
 
     def test_getRequestEncode(self):
         myList = []
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.0.3.4.5.7'), rfc1155.Integer(47) ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.4.5.4.55.4465.7'), rfc1155.Null() ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.2.5.8.6858.7'), 
-                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress(stringval='10.232.8.6') ]) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.0.3.4.5.7'), rfc1155.Integer(47) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.4.5.4.55.4465.7'), rfc1155.Null() ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.2.5.8.6858.7'), 
+                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 
 #        self.log.debug('myvarlist: %s' % myVarBindList)
@@ -75,10 +75,10 @@ class rfc1157Test(unittest.TestCase):
 
     def test_getNextRequestEncode(self):
         myList = []
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.0.3.4.5.7'), rfc1155.Integer(47) ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.4.5.4.55.4465.7'), rfc1155.Null() ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.2.5.8.6858.7'), 
-                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress(stringval='10.232.8.6') ]) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.0.3.4.5.7'), rfc1155.Integer(47) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.4.5.4.55.4465.7'), rfc1155.Null() ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.2.5.8.6858.7'), 
+                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
         obj = rfc1157.GetNextRequestPDU(5, varBindList=myVarBindList)
@@ -91,10 +91,10 @@ class rfc1157Test(unittest.TestCase):
 
     def test_getResponseEncode(self):
         myList = []
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.0.3.4.5.7'), rfc1155.Integer(47) ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.4.5.4.55.4465.7'), rfc1155.Null() ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.2.5.8.6858.7'), 
-                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress(stringval='10.232.8.6') ]) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.0.3.4.5.7'), rfc1155.Integer(47) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.4.5.4.55.4465.7'), rfc1155.Null() ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.2.5.8.6858.7'), 
+                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
         obj = rfc1157.GetResponsePDU(5, varBindList=myVarBindList)
@@ -107,10 +107,10 @@ class rfc1157Test(unittest.TestCase):
 
     def test_setRequestEncode(self):
         myList = []
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.0.3.4.5.7'), rfc1155.Integer(47) ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.4.5.4.55.4465.7'), rfc1155.Null() ) )
-        myList.append( rfc1157.VarBind( rfc1155.ObjectID(stringval='1.2.5.8.6858.7'), 
-                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress(stringval='10.232.8.6') ]) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.0.3.4.5.7'), rfc1155.Integer(47) ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.4.5.4.55.4465.7'), rfc1155.Null() ) )
+        myList.append( rfc1157.VarBind( rfc1155.ObjectID('.1.2.5.8.6858.7'), 
+                rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
         obj = rfc1157.SetRequestPDU(5, varBindList=myVarBindList)

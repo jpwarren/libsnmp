@@ -10,13 +10,11 @@
 #
 # This file is designed to be a drop in replacement for pysnmp code
 
-from string import split
-
 import util
 import debug
 import logging
-
-import array
+import types
+from string import split
 
 log = logging.getLogger('Asn1Object')
 
@@ -80,16 +78,15 @@ class Asn1Object:
     def encode(self):
         """ encode() this Asn1Object using BER 
         """
-        result = ''
-
-        result += self.encodeIdentifier()
         contents = self.encodeContents()
-
-        # What we do for lengths depends on whether this is
-        # a definite or indefinite object.
-        # Assuming definite objects for the moment.
-        result += self.encodeLength(len(contents))
-        result += contents
+        
+        resultlist = []
+        resultlist.append(self.encodeIdentifier())
+        resultlist.append(self.encodeLength(len(contents)))
+        resultlist.append(contents)
+        
+        result = ''.join(resultlist)
+        
         return result
 
     def decode(self, stream):
@@ -105,7 +102,7 @@ class Asn1Object:
         """
         objects = []
         while len(stream) > 0:
-
+            
             n = 0
             try:
                 tag = ord(stream[0])
@@ -141,12 +138,13 @@ class Asn1Object:
                     length = 0
                     for i in range(n):
                         length = (length << 8) | ord(stream[i+1])
-
+                        pass
+                    pass
                 stream = stream[n+1:]
-
+                
             except IndexError:
                 raise DecodeError('Encoding has no length octet: %s [%s]' % (className, objectData) )
-
+            
             # Now we know the type and length of the encoded
             # octet, so we pass those octets to the specific
             # deciding method for the object type.
@@ -187,56 +185,66 @@ class Asn1Object:
             for this object.
             Section 6.3 of ITU-T-X.209
         """
-        result = ''
-
+        
         if self.asnTagNumber <= 30:
-            result += chr(self.asnTagClass | self.asnTagFormat | self.asnTagNumber)
+            result = chr(self.asnTagClass | self.asnTagFormat | self.asnTagNumber)
 
         else:
             # encode each number of the asnTagNumber from 31 upwards
             # as a sequence of 7-bit numbers with bit 8 set to 1
             # for all but the last octet. Bit 8 set to 0 signifies
             # the last octet of the Identifier octets
-
+            
             # encode the first octet
-            result += self.asnTagClass | self.asnTagFormat | 0x1f
-
+            resultlist = []
+            resultlist.append(chr(self.asnTagClass | self.asnTagFormat | 0x1f))
+            
             # encode each subsequent octet
             integer = self.asnTagNumber
             while integer != -1:
-                (integer, result) = integer>>8, result + chr(integer & 0xff)
+                resultlist.append(chr(integer & 0xff))
+                integer = integer >> 8
                 pass
+            result = ''.join(resultlist)
             pass
+        
         return result
 
-    def encodeLength(self, length, isDefinite=None):
+    def encodeLength(self, length):
         """ encodeLength() takes the length of the contents and
             produces the encoding for that length.
             Section 6.3 of ITU-T-X.209
         """
-        result = ''
-        # Short form
+        
         if length < 127:
-            result += chr( length & 0xff )
-
-        # Long form
-        # Octet one is the number of octets used to encode the length
-        # It has bit 8 set to 1 and the remaining 7 bits are used to
-        # encode the number of octets used to encode the length
-        # Each subsequent octet uses all 8 bits to encode the length
-
+            result = chr( length & 0xff )
+            pass
+        
         else:
+            
+            # Long form - Octet one is the number of octets used to
+            # encode the length It has bit 8 set to 1 and the
+            # remaining 7 bits are used to encode the number of octets
+            # used to encode the length Each subsequent octet uses all
+            # 8 bits to encode the length
+            
             if __debug__: log.debug('Long length encoding required for length of %d' % length)
+
+            resultlist = []
             numOctets = 0
             while length > 0:
-                (length, result) = length>>8, chr(length & 0xff) + result
+                resultlist.insert(0, chr(length & 0xff))
+                length = length >> 8
                 numOctets += 1
-
+                pass
+            
             # Add a 1 to the front of the octet
             if __debug__: log.debug('long length encoding of: %d octets' % numOctets)
             numOctets = numOctets | 0x80
-            result = chr(numOctets & 0xff) + result
-
+            resultlist.insert(0, chr(numOctets & 0xff))
+            
+            result = ''.join(resultlist)
+            
         return result
 
     def encodeEndOfContents(self):
@@ -246,8 +254,8 @@ class Integer(Asn1Object):
     """ An ASN.1 Integer type
     """
     asnTagNumber = asnTagNumbers['Integer']
-    MAXVAL = 21344432L
-    MINVAL = -21344432L
+    MINVAL = -2147483648L
+    MAXVAL =  2147483647L
 
     def __init__(self, value=0L):
         Asn1Object.__init__(self)
@@ -305,7 +313,8 @@ class Integer(Asn1Object):
 
         elif integer > 0:
             while integer != 0:
-                integer, result = integer>>8, chr(integer & 0xff) + result
+                result = chr(integer & 0xff) + result
+                integer = integer >> 8
                 pass
 
             if ord(result[0]) & 0x80:
@@ -315,11 +324,15 @@ class Integer(Asn1Object):
 
         else:
             while integer != -1:
-                integer, result = integer>>8, chr(integer & 0xff) + result
-
+                result = chr(integer & 0xff) + result
+                integer = integer>>8
+                pass
+            
             if ord(result[0]) & 0x80 != 0x80:
                 result = chr(0x00) + result
-
+                pass
+            pass
+        
 
         if __debug__: log.debug('Encoded Integer as: %s' % util.octetsToHex(result) )
 
@@ -333,7 +346,7 @@ class Integer(Asn1Object):
         ##
 
         if __debug__: log.debug('Decoding %s' % util.octetsToHex(stream) )
-        self.value = 0
+        self.value = 0L
         byte = ord(stream[0])
         if (byte & 0x80) == 0x80:
             negbit = 0x80L
@@ -343,15 +356,17 @@ class Integer(Asn1Object):
                 byte = ord(stream[i+1])
                 negbit <<= 8
                 self.value = (self.value << 8) | byte
-
+                pass
+            
             self.value = self.value - negbit
 
         else:
-            self.value = byte
+            self.value = long(byte)
             for i in range(len(stream)-1):
                 byte = ord(stream[i+1])
                 self.value = (self.value<<8) | byte
-
+                pass
+            pass
         if __debug__: log.debug('decoded as: %d' % self.value)
 
         return self
@@ -365,6 +380,8 @@ class Integer(Asn1Object):
         bytes = map(ord, stream)
         if bytes[0] & 0x80:
             bytes.insert(0, -1L)
+            pass
+
         result = reduce(lambda x,y: x<<8 | y, bytes, 0L)
 
         return result
@@ -383,7 +400,8 @@ class Integer(Asn1Object):
                 byte = ord(stream[i+1])
                 negbit <<= 8
                 val = (val << 8) | byte
-
+                pass
+            
             val = val - negbit
 
         else:
@@ -391,7 +409,8 @@ class Integer(Asn1Object):
             for i in range(len(stream)-1):
                 byte = ord(stream[i+1])
                 val = (val<<8) | byte
-
+                pass
+            pass
         return val
 
     def decodeTwosInteger3(self, stream):
@@ -454,15 +473,16 @@ class ObjectID(Asn1Object):
     """
     asnTagNumber = asnTagNumbers['ObjectID']
 
-    def __init__(self, value=None, stringval=None):
+    def __init__(self, value=None):
         """ value is a list of subids
             stringval is a ObjectID is dotted notation in leading
             dot form, eg: .1.3.6.1.2.1.1.1.0
         """ 
         Asn1Object.__init__(self)
 
-        if stringval:
-            vals = split(stringval, '.')
+        if type(value) == types.StringType:
+            
+            vals = split(value, '.')
             if vals[0] != '':
                 raise ValueError('ObjectID string must be in leading dot form')
             self.value = []
@@ -472,26 +492,55 @@ class ObjectID(Asn1Object):
                 if val < 0:
                     raise ValueError("SubIDs cannot be negative")
                 self.value.append( val )
-
-        elif value:
+                pass
+            pass
+        elif type(value) == types.ListType or type(value) == types.NoneType:
             self.value = value
-
+        elif type(value) == types.TupleType:
+            self.value = list(value)
+        else:
+            raise TypeError('unknown type passed as OID')
+        return
+    
     def __str__(self):
-        result = ['',]
-        if self.value:
-            for num in self.value:
-                result.append('%d' % num)
-        return '.'.join(result)
+        if self.value is not None:
+            return '.'.join( [str(x) for x in self.value] )
+        else:
+            return ''
+        pass
+    
+    def __eq__(self, other):
 
-    def isPrefix(self, objId):
+        """Compare the values of two instances"""
+        
+        if isinstance(other, self.__class__):
+            return self.value == other.value
+        else:
+            return False
+        pass
+    
+    def __len__(self):
+        """Return the length of the value"""
+        return len(self.value)
+    
+    def __ne__(self, other):
+        return not (self == other)
+    
+    def isPrefixOf(self, other):
         """ Compares this ObjectID with another ObjectID and
             returns non-None if this ObjectID is a prefix of
             the other one.
         """
-        if not isinstance(objId, self.__class__):
+        if not isinstance(other, self.__class__):
             raise NotImplementedError
-        return cmp(self.value, objId.value)
-
+        if len(other) < len(self):
+            return False
+        for i in range(len(self)):
+            if self.value[i] != other.value[i]:
+                return False
+            pass
+        return True
+    
     def encodeContents(self):
         """ encode() an objectID into an octet stream
         """
@@ -518,9 +567,12 @@ class ObjectID(Asn1Object):
                 while subid > 0:
                     res.insert( 0, '%c' % (0x80 | (subid & 0x7f)) )
                     subid = subid >> 7
-
+                    pass
+                
                 result += res
-
+                pass
+            pass
+        
         return ''.join(result)
 
     def decodeContents(self, stream):
@@ -593,6 +645,7 @@ class Null(Asn1Object):
             raise ValueError('Input stream too long for %s' % self.__class__.__name__)
 
         return Null()
+    pass
 
 class Sequence(Asn1Object):
     """ A Sequence is basically a list of name, value pairs
@@ -633,11 +686,14 @@ class Sequence(Asn1Object):
         """ To encode a Sequence, we simply encode() each sub-object 
             in turn.
         """
-        result = ''
         if __debug__: log.debug('Encoding sequence contents...')
+        resultlist = []
         for elem in self.value:
-            result += elem.encode()
-
+            resultlist.append(elem.encode())
+            pass
+        
+        result = ''.join(resultlist)
+        
         return result
 
     def decodeContents(self, stream):
@@ -646,6 +702,7 @@ class Sequence(Asn1Object):
         objectList = self.decode(stream)
 
         return Sequence(objectList)
+    pass
 
 class SequenceOf(Sequence):
     """ A SequenceOf is a special kind of sequence
@@ -676,40 +733,45 @@ class IPAddress(OctetString):
         OctetString of length 4, in network byte order.
     """
 
-    def __init__(self, value='', stringval=None):
+    def __init__(self, value=''):
         OctetString.__init__(self, value)
-        if value:
+
+        if type(value) == types.ListType:
             if len(value) != 4:
                 raise ValueError('IPAddress must be of length 4')
             pass
-
-        if stringval:
+        elif type(value) == types.StringType:
             self.value = ''
-            listform = split(stringval, '.')
+            listform = split(value, '.')
             if len(listform) != 4:
                 raise ValueError('IPAddress must be of length 4')
-
+            
             for item in listform:
                 self.value += chr(int(item))
                 pass
-
+            pass
+        return
+    
     def __str__(self):
         result = []
         for item in self.value:
             result.append( '%d' % ord(item) )
+            pass
         return '.'.join(result)
+    pass
 
 class NetworkAddress(IPAddress):
     """ A Network Address is a CHOICE with only one possible
         value: internet
     """
     name = 'internet'
+    pass
 
 class Counter(Integer):
     """ A counter starts at zero and keeps going to a maximum
         integer value of 2^32-1 where it wraps back to zero.
     """
-    MINVAL = 0
+    MINVAL = 0L
     MAXVAL = 4294967295L
 
     def __add__(self, val):
@@ -719,6 +781,26 @@ class Counter(Integer):
             self.value = val - ( self.MAXVAL - self.value )
         else:
             self.value += val
+            pass
+        return
+
+    def decodeContents(self, stream):
+        
+        result = Integer.decodeContents(self, stream)
+        
+        ## Some agents encode Counters incorrectly (hello Solaris) as
+        ## a negative number.  I'm assuming most SNMP libraries don't
+        ## notice the problem because the are written in C and cast
+        ## the result to an unsigned int - problem solved (if
+        ## accidentally).  This ugly hack on their behalf flips the
+        ## value over to the positive world.
+        
+        if self.value < 0:
+            self.value += 0x100000000L
+            pass
+        return result
+    
+    pass
 
 class Guage(Integer):
     """ A Guage is a non negative integer.
@@ -743,6 +825,9 @@ class Guage(Integer):
             self.value = self.MINVAL
         else:
             self.value -= val
+            pass
+        return
+    pass
 
 class TimeTicks(Integer):
     """ TimeTicks is the number of hundredths of a second

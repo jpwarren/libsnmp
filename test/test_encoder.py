@@ -49,14 +49,14 @@ test_sequences = {
     '\002\001\016':         [ rfc1155.Integer(14), ],
     '\002\002\006\321':         [ rfc1155.Integer(1745), ],
     '\002\001\077\005\000':         [ rfc1155.Integer(63), rfc1155.Null() ], 
-    '\006\006\051\006\005\054\003\005\004\004\142\154\141\150\002\003\001\202\037':         [ rfc1155.ObjectID(stringval='.1.1.6.5.44.3.5'), rfc1155.OctetString('blah'), rfc1155.Integer(98847) ]
+    '\006\006\051\006\005\054\003\005\004\004\142\154\141\150\002\003\001\202\037':         [ rfc1155.ObjectID('.1.1.6.5.44.3.5'), rfc1155.OctetString('blah'), rfc1155.Integer(98847) ]
 
 }
 
 test_sequenceOf = {
     'blah':  [ rfc1155.Integer, [ rfc1155.Integer(7), rfc1155.Integer(5567), rfc1155.Integer(84743) ] ],
 
-    'fred':  [ rfc1155.ObjectID, [ rfc1155.ObjectID(stringval='.1.2.4.3'), rfc1155.ObjectID(stringval='.1.0.4.6.44') ] ]
+    'fred':  [ rfc1155.ObjectID, [ rfc1155.ObjectID('.1.2.4.3'), rfc1155.ObjectID('.1.0.4.6.44') ] ]
 }
 
 test_ipaddresses = {
@@ -142,7 +142,7 @@ class EncoderTest(unittest.TestCase):
         """ Test encode of ObjectID type
         """
         for item in test_objectids.keys():
-            myobj = rfc1155.ObjectID(stringval=item)
+            myobj = rfc1155.ObjectID(item)
             octets = myobj.encodeContents()
 #            self.log.debug('Got value [length %s]: %s, oct: %s' % ( len(octets), util.octetsToHex(octets), util.octetsToOct(octets)) )
             self.assertEquals(test_objectids[item], octets)
@@ -151,7 +151,7 @@ class EncoderTest(unittest.TestCase):
         """ Test encode/decode of ObjectID type
         """
         for item in test_objectids.keys():
-            myobj = rfc1155.ObjectID(stringval=item)
+            myobj = rfc1155.ObjectID(item)
             octets = myobj.encodeContents()
             object = myobj.decodeContents(octets)
             result = ['',]
@@ -223,7 +223,7 @@ class EncoderTest(unittest.TestCase):
         """ Test encode of IPAddress type
         """
         for item in test_ipaddresses.keys():
-            myobj = rfc1155.IPAddress(stringval=test_ipaddresses[item])
+            myobj = rfc1155.IPAddress(test_ipaddresses[item])
 #            self.log.debug('IPAddress: %s' % myobj)
 
 

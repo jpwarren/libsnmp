@@ -29,7 +29,7 @@ class MessagesTest(unittest.TestCase):
         """ Test encode/decode of Message
         """
         # Set up a Get request for the system uptime
-        oid = rfc1155.ObjectID(stringval='.1.3.6.1.2.1.1.3.0')
+        oid = rfc1155.ObjectID('.1.3.6.1.2.1.1.3.0')
         val = rfc1155.Null()
         variable = rfc1157.VarBind( oid, val )
         object = rfc1157.VarBindList( [variable, ] )
