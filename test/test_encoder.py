@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # $Id$
 # Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 # All Rights Reserved
@@ -141,37 +143,46 @@ class EncoderTest(unittest.TestCase):
             self.assertEquals(item, object.value)
 
     def test_objectidEncode(self):
-        """ Test encode of ObjectID type
-        """
-        for item in test_objectids.keys():
-            myobj = rfc1155.ObjectID(item)
+        
+        """Test encode of ObjectID type"""
+        
+        for input, output in test_objectids.items():
+            myobj = rfc1155.ObjectID(input)
             octets = myobj.encodeContents()
-#            self.log.debug('Got value [length %s]: %s, oct: %s' % ( len(octets), util.octetsToHex(octets), util.octetsToOct(octets)) )
-            self.assertEquals(test_objectids[item], octets)
-
+            self.assertEquals(octets, output)
+            pass
+        return
+    
     def test_objectidEncodeDecode(self):
-        """ Test encode/decode of ObjectID type
-        """
-        for item in test_objectids.keys():
-            myobj = rfc1155.ObjectID(item)
+        
+        """Test encode/decode of ObjectID type"""
+        
+        for input, output in test_objectids.items():
+            myobj = rfc1155.ObjectID(input)
             octets = myobj.encodeContents()
             object = myobj.decodeContents(octets)
-            result = ['',]
-            for num in object.value:
-                result.append( '%d' % num )
-            result = '.'.join(result)
-            self.assertEquals(item, result)
-
+            
+            result = []
+            
+            input_check = input.lstrip('.')
+            output_check = '.'.join( [ str(x) for x in object.value ] )
+            self.assertEquals(input_check, output_check)
+            pass
+        return
+    
     def test_nullEncode(self):
-        """ Test encode of Null type
-        """
+        
+        """Test encode of Null type"""
+        
         myobj = rfc1155.Null()
         octets = myobj.encodeContents()
         self.assertEquals(octets, '')
-
+        return
+    
     def test_nullEncodeDecode(self):
-        """ Test encode/decode of Null type
-        """
+        
+        """Test encode/decode of Null type"""
+        
         myobj = rfc1155.Null()
         octets = myobj.encodeContents()
         object = myobj.decodeContents(octets)
@@ -183,7 +194,7 @@ class EncoderTest(unittest.TestCase):
         for item in test_sequences.keys():
             myobj = rfc1155.Sequence(test_sequences[item])
             octets = myobj.encodeContents()
-#            self.log.debug('Got value [length %s]: %s, oct: %s' % ( len(octets), util.octetsToHex(octets), util.octetsToOct(octets)) )
+            #self.log.debug('Got value [length %s]: %s, oct: %s' % ( len(octets), util.octetsToHex(octets), util.octetsToOct(octets)) )
             self.assertEquals(item, octets)
 
     def test_sequenceEncodeDecode(self):

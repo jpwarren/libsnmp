@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # $Id$
 # Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 # All Rights Reserved

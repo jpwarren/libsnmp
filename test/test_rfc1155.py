@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # $Id$
 # Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 # All Rights Reserved
@@ -35,7 +37,6 @@ class EncoderTest(unittest.TestCase):
         input_c = '.'.join( [ str(x) for x in input_a] ) # string no leading dot
         input_d = '.' + input_c         # string leading dot
         
-
         a = rfc1155.ObjectID(input_a)
         b = rfc1155.ObjectID(input_b)
         c = rfc1155.ObjectID(input_c)
@@ -73,20 +74,18 @@ class EncoderTest(unittest.TestCase):
 
     def test_ip_address(self):
         
-        addresses = ['0.0.0.0',          ''
-                     '255.255.255.255',  ''
-                     '1.2.3.4',          ''
-                     '10,0.0.1',         ''
-                     '254.154.1.0',      ''
-                     '0.0.0.1',          ''
-                     '255.0.0.0'         '']
+        addresses = (('0.0.0.0',          '@\x04\x00\x00\x00\x00'),
+                     ('255.255.255.255',  '@\x04\xff\xff\xff\xff'),
+                     ('1.2.3.4',          '@\x04\x01\x02\x03\x04'),
+                     ('10.0.0.1',         '@\x04\n\x00\x00\x01'),
+                     ('254.154.1.0',      '@\x04\xfe\x9a\x01\x00'),
+                     ('0.0.0.1',          '@\x04\x00\x00\x00\x01'),
+                     ('255.0.0.0',        '@\x04\xff\x00\x00\x00'))
         
-        for address in addresses:
-            a = rfc1155.IPAddress(address)
-            blah = a.encode()
-            print repr(blah)
-            b = rfc1155.Asn1Object().decode(blah)[0]
-            print b
+        for input, output in addresses:
+            a = rfc1155.IPAddress(input)
+            raw = a.encode()
+            b = rfc1155.Asn1Object().decode(raw)[0]
             self.assertEquals(a,b)
             pass
         return
@@ -95,7 +94,7 @@ class EncoderTest(unittest.TestCase):
     def test_objectid_length(self):
         
         """test length"""
-
+        
         input_a = [1,3,6,1,2,1,2,3,234,23,4,23,423,234,23423423,4234] # list
         input_b = tuple(input_a)        # tuple
         input_c = '.'.join( [ str(x) for x in input_a] ) # string no leading dot

@@ -30,12 +30,12 @@ class ErrorStatus(rfc1155.Integer):
     """
     # define a dictionary of error codes
     errString = { 
-            0:      'No Error',
-            1:      'Response message would have been too large',
-            2:      'There is no such variable name in this MIB',
-            3:      'The value given has the wrong type',
-            4:      'Object is Read Only',
-            5:      'An unknown error occurred'
+        0:      'No Error',
+        1:      'Response message would have been too large',
+        2:      'There is no such variable name in this MIB',
+        3:      'The value given has the wrong type',
+        4:      'Object is Read Only',
+        5:      'An unknown error occurred'
     }
 
     errNum = {
@@ -46,7 +46,7 @@ class ErrorStatus(rfc1155.Integer):
         'readOnly':     4,
         'genErr':       5,
     }
-
+    
     def __str__(self):
         """ Return a nicer looking error
         """
@@ -73,6 +73,8 @@ class VarBindList(rfc1155.SequenceOf):
     """
     def __init__(self, value=[]):
         rfc1155.SequenceOf.__init__(self, VarBind, value)
+        return
+    pass
 
 class Message(rfc1155.Sequence):
     """ A Message is the base comms type for all SNMP messages

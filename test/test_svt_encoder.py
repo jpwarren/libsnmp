@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # $Id$
 # Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 # All Rights Reserved
@@ -6,6 +8,7 @@
 
 import logging
 import string
+import time
 
 import random
 import profile
@@ -27,18 +30,23 @@ random.seed()
 integers = []
 object_ids = []
 
+start = time.time()
+
 for i in range(NUMBER_OF_OBJECTS):
     # Generate a random integer
     integers.append( random.randrange( rfc1155.Integer.MINVAL, rfc1155.Integer.MAXVAL ) )
+    pass
 
 # set up some random ObjectIDs
 for i in range(NUMBER_OF_OBJECTS):
     object_ids.append( [ 1, 3, 6, 1, random.randrange( 0, 50000 ), random.randrange( 0, 50000 ), random.randrange(0, 50000), random.randrange(0, 50000) ] )
-
+    pass
 
 def encodeRandomIntegers():
     for i in integers:
         octets = rfc1155.Integer(i).encode()
+        pass
+    pass
 
 def encodeDecodeRandomIntegers():
     """ Test SVT Encode and Decode of Integer type
@@ -46,12 +54,16 @@ def encodeDecodeRandomIntegers():
     for i in integers:
         octets = rfc1155.Integer(i).encode()
         object = rfc1155.Asn1Object().decode(octets)
+        pass
+    pass
 
 def encodeRandomObjectIDs():
     """ Test SVT Encode and Decode of ObjectID type
     """
     for i in object_ids:
         octets = rfc1155.ObjectID(i).encode()
+        pass
+    pass
 
 def encodeDecodeRandomObjectIDs():
     """ Test SVT Encode and Decode of ObjectID type
@@ -59,19 +71,25 @@ def encodeDecodeRandomObjectIDs():
     for i in object_ids:
         octets = rfc1155.ObjectID(i).encode()
         object = rfc1155.Asn1Object().decode(octets)
+        pass
+    pass
 
 if __name__ == '__main__':
-
-#    print "Profiling encoding %d random integers..." % NUMBER_OF_OBJECTS
-#    profile.run('encodeRandomIntegers()')
-
-#    print "Profiling encoding/decoding of %d random integers..." % NUMBER_OF_OBJECTS
-#    profile.run('encodeDecodeRandomIntegers()')
-
-#    print "Profiling encoding of %d random ObjectIDs..." % NUMBER_OF_OBJECTS
-#    profile.run('encodeRandomObjectIDs()')
-
+    
+    #    print "Profiling encoding %d random integers..." % NUMBER_OF_OBJECTS
+    #    profile.run('encodeRandomIntegers()')
+    
+    #    print "Profiling encoding/decoding of %d random integers..." % NUMBER_OF_OBJECTS
+    #    profile.run('encodeDecodeRandomIntegers()')
+    
+    #    print "Profiling encoding of %d random ObjectIDs..." % NUMBER_OF_OBJECTS
+    #    profile.run('encodeRandomObjectIDs()')
+    
     print "Profiling encoding/decoding of %d random ObjectIDs..." % NUMBER_OF_OBJECTS
     profile.run('encodeDecodeRandomObjectIDs()')
-
+    #encodeDecodeRandomObjectIDs()  
+    
+    end = time.time()
+    diff = end - start
+    print 'time to run %4.2f seconds' % diff
     logging.shutdown()
