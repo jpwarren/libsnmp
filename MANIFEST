@@ -14,4 +14,5 @@ lib/libsnmp/asynrole.py
 test/test_Messages.py
 test/test_encoder.py
 test/test_rfc1157.py
+test/test_rfc1155.py
 test/test_svt_encoder.py
