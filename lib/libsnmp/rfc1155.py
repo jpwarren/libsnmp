@@ -24,6 +24,9 @@
 # stuff is, which is faster for something that is a dedicated
 # application of ASN.1, like SNMP.
 
+# I've included here all the basic SNMPv1 types, since they are used
+# by SNMPv2 and v3.
+
 import util
 import debug
 import logging
@@ -31,7 +34,6 @@ import types
 
 log = logging.getLogger('Asn1Object')
 
-##
 ## change logging level.. options of:
 ##
 ## logging.CRITICAL
@@ -170,7 +172,7 @@ class Asn1Object:
         type result in an error.  """
         
         if type(stream) != types.StringType:
-            raise TypeError
+            raise TypeError('stream should be of type StringType, not %s' % type(stream) )
         
         objects = []
         while len(stream) > 0:
@@ -272,11 +274,13 @@ class Asn1Object:
     ##
     ## 
     def __eq__(self, other):
-        
-        """Compare two instance by comparison of their value fields
-        only"""
+        """
+        Compare two instance by comparison of their value fields
+        only.
+        """
         
         return isinstance(other, self.__class__) and self.value == other.value
+#        return self.value == other.value
     
     ##
     ##
@@ -327,6 +331,17 @@ class Integer(Asn1Object):
         return self.value
 
     # Define some handy arithmetic operations
+    def __eq__(self, other):
+        try:
+            log.debug('checking out %s' % other)
+            if self.value == long(other):
+                return True
+
+        except:
+            raise
+
+        return False
+
     def __add__(self, integer):
         """ Add a value
         """
@@ -813,7 +828,6 @@ class SequenceOf(Sequence):
         return
     pass
 
-
 class IPAddress(OctetString):
 
     """An IpAddress is a special type of OctetString.  It represents a
@@ -864,16 +878,18 @@ class IPAddress(OctetString):
 
 class NetworkAddress(IPAddress):
     
-    """A Network Address is a CHOICE with only one possible value:
-    internet"""
+    """ A Network Address is a CHOICE with only one possible value:
+        internet
+    """
     
     name = 'internet'
     pass
 
 class Counter(Integer):
 
-    """A counter starts at zero and keeps going to a maximum integer
-    value of 2^32-1 where it wraps back to zero.  """
+    """ A counter starts at zero and keeps going to a maximum integer
+        value of 2^32-1 where it wraps back to zero.
+    """
     
     asnTagClass = asnTagClasses['APPLICATION']
     asnTagFormat = asnTagFormats['PRIMITIVE']
@@ -884,8 +900,9 @@ class Counter(Integer):
     
     def __add__(self, val):
         
-        """We only add to a counter, and we check for a wrap
-        condition"""
+        """ We only add to a counter, and we check for a wrap
+            condition.
+        """
         
         if self.value + val > self.MAXVAL:
             self.value = val - ( self.MAXVAL - self.value )
@@ -914,8 +931,9 @@ class Counter(Integer):
 
 class Guage(Integer):
 
-    """A Guage is a non negative integer.  It may increase or
-    decrease.  It latches at a maximum value."""
+    """ A Guage is a non negative integer.  It may increase or
+        decrease. It latches at a maximum value.
+    """
     
     asnTagClass = asnTagClasses['APPLICATION']
     asnTagFormat = asnTagFormats['PRIMITIVE']
@@ -950,8 +968,9 @@ class Guage(Integer):
 
 class TimeTicks(Integer):
     
-    """TimeTicks is the number of hundredths of a second since an
-    epoch, specified at object creation time """
+    """ TimeTicks is the number of hundredths of a second since an
+        epoch, specified at object creation time
+    """
     
     asnTagClass = asnTagClasses['APPLICATION']
     asnTagFormat = asnTagFormats['PRIMITIVE']

@@ -18,22 +18,19 @@
 #    License along with this library; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import rfc1155
-
 import logging
 import debug
 log = logging.getLogger('rfc1157')
 
-rfc1155.asnTagNumbers = {
-    'Get':          0x00,
-    'GetNext':      0x01,
-    'GetResponse':  0x02,
-    'Set':          0x03,
-    'Trap':         0x04,
-}
+from rfc1155 import *
 
+asnTagNumbers['Get'] = 0x00
+asnTagNumbers['GetNext'] = 0x01
+asnTagNumbers['Response'] = 0x02
+asnTagNumbers['Set'] = 0x03
+asnTagNumbers['Trap'] = 0x04
 
-class ErrorStatus(rfc1155.Integer):
+class ErrorStatus(Integer):
     """ Error Status
     """
     # define a dictionary of error codes
@@ -60,38 +57,38 @@ class ErrorStatus(rfc1155.Integer):
         """
         return '%d: %s' % (self.value, self.errString[self.value])
 
-class VarBind(rfc1155.Sequence):
+class VarBind(Sequence):
     """ Variable Binding
         This binds a name to an object
     """
     def __init__(self, name=None, value=None):
         if name:
-            if not isinstance( name, rfc1155.ObjectID ):
+            if not isinstance( name, ObjectID ):
                 raise ValueError('name must be an ObjectID')
         if value:
-            if not isinstance( value, rfc1155.Asn1Object ):
+            if not isinstance( value, Asn1Object ):
                 raise ValueError('name must be an Asn1Object')
 
         self.objectID = name
         self.objectValue = value
-        rfc1155.Sequence.__init__(self, [ self.objectID, self.objectValue ] )
+        Sequence.__init__(self, [ self.objectID, self.objectValue ] )
 
-class VarBindList(rfc1155.SequenceOf):
+class VarBindList(SequenceOf):
     """ A Sequence of VarBinds
     """
     def __init__(self, value=[]):
-        rfc1155.SequenceOf.__init__(self, VarBind, value)
+        SequenceOf.__init__(self, VarBind, value)
         return
     pass
 
-class Message(rfc1155.Sequence):
+class Message(Sequence):
     """ A Message is the base comms type for all SNMP messages
     """
 
     def __init__(self, version=0, community='public', data=None):
-        rfc1155.Sequence.__init__(self)
-        self.version = rfc1155.Integer(version)
-        self.community = rfc1155.OctetString(community)
+        Sequence.__init__(self)
+        self.version = Integer(version)
+        self.community = OctetString(community)
         self.data = data
 
     def __str__(self):
@@ -105,10 +102,10 @@ class Message(rfc1155.Sequence):
         self.value.append(self.version)
         self.value.append(self.community)
         self.value.append(self.data)
-        return rfc1155.Sequence.encodeContents(self)
+        return Sequence.encodeContents(self)
 
     def decode(self, stream):
-        objectList = rfc1155.Sequence().decode(stream)
+        objectList = Sequence().decode(stream)
 
         # Should return a single Sequence
         if len(objectList) != 1:
@@ -128,40 +125,32 @@ class MessageError(Exception):
     def __init__(self, args=None):
         self.args = args
 
-class RequestPDU(rfc1155.Sequence):
+class PDU(Sequence):
     """ Base class for a non-trap PDU
     """
-    asnTagClass = rfc1155.asnTagClasses['CONTEXT']
+    asnTagClass = asnTagClasses['CONTEXT']
 
     def __init__(self, requestID=0, errorStatus=0, errorIndex=0, varBindList=[]):
         """ __init__ allows you to create a new object with no arguments,
-            arguments of the class ultimately desired (eg rfc1155.Integer)
+            arguments of the class ultimately desired (eg Integer)
             or, to make like easier, it will convert basic strings and ints
             into the ultimately desired objects.
         """
-        rfc1155.Sequence.__init__(self)
+        Sequence.__init__(self)
 
-        self.requestID = rfc1155.Integer(requestID)
+        self.requestID = Integer(requestID)
         self.errorStatus = ErrorStatus(errorStatus)
-        self.errorIndex = rfc1155.Integer(errorIndex)
+        self.errorIndex = Integer(errorIndex)
         self.varBindList = VarBindList(varBindList)
 
         self.value = [ self.requestID, self.errorStatus, self.errorIndex, self.varBindList ]
 
-    def encodeContents(self):
-        self.value = []
-        self.value.append(self.requestID)
-        self.value.append(self.errorStatus)
-        self.value.append(self.errorIndex)
-        self.value.append(self.varBindList)
-        return rfc1155.Sequence.encodeContents(self)
-
     def decodeContents(self, stream):
-        """ Decode into a GetRequestPDU Object
+        """ Decode into a Get PDU Object
         """
-        objectList = rfc1155.Sequence.decodeContents(self, stream)
+        objectList = Sequence.decodeContents(self, stream)
         if len(self.value) != 4:
-            raise RequestPDUError('Malformed RequestPDU: Incorrect length %d' % len(self.value) )
+            raise PDUError('Malformed PDU: Incorrect length %d' % len(self.value) )
 
         # Build things with the correct type
         myVarList = VarBindList()
@@ -170,31 +159,31 @@ class RequestPDU(rfc1155.Sequence):
 
         return self.__class__( int(objectList[0]), int(objectList[1]), int(objectList[2]), myVarList)
         
-class RequestPDUError(Exception):
+class PDUError(Exception):
     def __init__(self, args=None):
         self.args = args
 
-class GetRequestPDU(RequestPDU):
+class Get(PDU):
     """ A Get Request PDU
     """
-    asnTagNumber = rfc1155.asnTagNumbers['Get']
+    asnTagNumber = asnTagNumbers['Get']
 
-class GetNextRequestPDU(RequestPDU):
-    """ A GetNext Request PDU
+class GetNext(PDU):
+    """ A GetNext PDU
     """
-    asnTagNumber = rfc1155.asnTagNumbers['GetNext']
+    asnTagNumber = asnTagNumbers['GetNext']
 
-class GetResponsePDU(RequestPDU):
-    """ A Get Response PDU
+class Response(PDU):
+    """ A Response PDU
     """
-    asnTagNumber = rfc1155.asnTagNumbers['GetResponse']
+    asnTagNumber = asnTagNumbers['Get']
 
-class SetRequestPDU(RequestPDU):
-    """ A Set Request PDU
+class Set(PDU):
+    """ A Set PDU
     """
-    asnTagNumber = rfc1155.asnTagNumbers['Set']
+    asnTagNumber = asnTagNumbers['Set']
 
-class GenericTrap(rfc1155.Integer):
+class GenericTrap(Integer):
     """ Generic Trap type
     """
     genericTraps = {
@@ -212,20 +201,20 @@ class GenericTrap(rfc1155.Integer):
         """
         return '%s: %d (%s)' % (self.__class__.__name__, self.value, self.genericTraps[self.value])
 
-class TrapPDU(rfc1155.Sequence):
+class TrapPDU(Sequence):
     """ A Trap PDU
     """
-    asnTagClass = rfc1155.asnTagClasses['CONTEXT']
-    asnTagNumber = rfc1155.asnTagNumbers['Trap']
+    asnTagClass = asnTagClasses['CONTEXT']
+    asnTagNumber = asnTagNumbers['Trap']
 
     def __init__(self, enterprise=None, agentAddr=None, genericTrap=None, specificTrap=None, timestamp=None, varBindList=None):
-        rfc1155.Sequence.__init__(self)
+        Sequence.__init__(self)
 
-        self.enterprise = enterprise        # rfc1155.ObjectID
-        self.agentAddr = agentAddr          # rfc1155.NetworkAddress
+        self.enterprise = enterprise        # ObjectID
+        self.agentAddr = agentAddr          # NetworkAddress
         self.genericTrap = genericTrap      # GenericTrap
-        self.specificTrap = specificTrap    # rfc1155.Integer
-        self.timestamp = timestamp          # rfc1155.TimeTicks
+        self.specificTrap = specificTrap    # Integer
+        self.timestamp = timestamp          # TimeTicks
         self.varBindList = varBindList      # VarBindList
 
         self.value = []
@@ -237,15 +226,15 @@ class TrapPDU(rfc1155.Sequence):
         self.value.append(self.varBindList)
 
 #    def encodeContents(self):
-#        return rfc1155.Sequence.encodeContents(self)
+#        return Sequence.encodeContents(self)
 
     def decodeContents(self, stream):
-        """ Decode into a GetRequestPDU Object
+        """ Decode into a Get PDU Object
         """
-        objectList = rfc1155.Sequence.decodeContents(self, stream)
+        objectList = Sequence.decodeContents(self, stream)
 
         if len(self.value) != 6:
-            raise RequestPDUError('Malformed TrapPDU: Incorrect length %d' % len(self.value) )
+            raise PDUError('Malformed TrapPDU: Incorrect length %d' % len(self.value) )
 
         # Build things with the correct type
         myVarList = VarBindList()
@@ -255,9 +244,8 @@ class TrapPDU(rfc1155.Sequence):
         return self.__class__( objectList[0], objectList[1], int(objectList[2]), int(objectList[3]), objectList[4], myVarList)
 
 # Add some new decode types
-# The string is evaluated in rfc1155 context
-rfc1155.tagDecodeDict[0xa0] = GetRequestPDU
-rfc1155.tagDecodeDict[0xa1] = GetNextRequestPDU
-rfc1155.tagDecodeDict[0xa2] = GetResponsePDU
-rfc1155.tagDecodeDict[0xa3] = SetRequestPDU
-rfc1155.tagDecodeDict[0xa4] = TrapPDU
+tagDecodeDict[0xa0] = Get
+tagDecodeDict[0xa1] = GetNext
+tagDecodeDict[0xa2] = Response
+tagDecodeDict[0xa3] = Set
+tagDecodeDict[0xa4] = TrapPDU
