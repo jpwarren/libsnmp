@@ -28,13 +28,15 @@ from libsnmp import role
 
 class manager(asyncore.dispatcher):
     
-    def __init__(self, (cb_fun, cb_ctx), dst=(None, 0), interface=('0.0.0.0', 0)):
+    def __init__(self, (cb_fun, cb_ctx), dst=(None, 0), interface=('0.0.0.0', 0), timeout=0.25):
         
         if not callable(cb_fun):
             raise ValueError('Non-callable callback function')
         
         self.cb_fun = cb_fun
         self.cb_ctx = cb_ctx
+
+        self.timeout = timeout
         
         asyncore.dispatcher.__init__(self)
         
@@ -74,3 +76,5 @@ class manager(asyncore.dispatcher):
         return
     pass
 
+    def poll(self):
+        asyncore.poll(self.timeout)

@@ -74,7 +74,7 @@ def whenDone(snmpClient):
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
 # Probably replace with something that assigns a random port
-myClient = v1.SNMP( ('localhost', 9999), whenDone )
+myClient = v1.SNMP( whenDone )
 
 #remotesite = ( 'localhost', 161 )
 #myClient.snmpGet('.1.3.6.1.2.1.1.1.0', remotesite, checkResponse)

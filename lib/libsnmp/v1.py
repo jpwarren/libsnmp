@@ -30,21 +30,22 @@ import os
 from libsnmp import debug
 from libsnmp import rfc1155
 from libsnmp import rfc1157
+from libsnmp import asynrole
+import asyncore
 
 log = logging.getLogger('v1.SNMP')
 
-class SNMP:
+class SNMP(asynrole.manager):
 
     nextRequestID = 0L      # global counter of requestIDs
 
-    def __init__(self, localaddr, queueEmpty=None, trapCallback=None, timeout=0.25):
+    def __init__(self, queueEmpty=None, trapCallback=None, interface=('0.0.0.0', 0), timeout=0.25):
         """ Create a new SNMPv1 object bound to localaddr
             where localaddr is an address tuple of the form
             ('server', port)
             queueEmpty is a callback of what to do if I run out
             of stuff to do. Default is to wait for more stuff.
         """
-        self.timeout = timeout
         self.queueEmpty = queueEmpty
         self.outbound = Queue.Queue()
         self.callbacks = {}
@@ -52,10 +53,13 @@ class SNMP:
         # What to do if we get a trap
         self.trapCallback = trapCallback
 
+        # initialise as an asynrole manager
+        asynrole.manager.__init__(self, (self.receiveData, None), interface=interface, timeout=timeout )
+
         try:
             # figure out the current system uptime
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.sock.bind( localaddr )
+
+            pass
 
         except:
             raise
@@ -81,7 +85,7 @@ class SNMP:
         """ Creates a message object from a pdu and a
             community string.
         """
-        objID = rfc1155.ObjectID(stringval=oid)
+        objID = rfc1155.ObjectID(oid)
         val = rfc1155.Null()
         varbindlist = rfc1157.VarBindList( [ rfc1157.VarBind(objID, val) ] )
         pdu = self.createGetRequestPDU( varbindlist )
@@ -104,10 +108,10 @@ class SNMP:
         """ Creates a Trap PDU object from a list of strings and integers
             along with a varBindList to make it a bit easier to build a Trap.
         """
-        ent = rfc1155.ObjectID(stringval=enterprise)
+        ent = rfc1155.ObjectID(enterprise)
         if not agentAddr:
             agentAddr = self.sock.getsockname()[0]
-        agent = rfc1155.NetworkAddress(stringval=agentAddr)
+        agent = rfc1155.NetworkAddress(agentAddr)
         gTrap = rfc1157.GenericTrap(genericTrap)
         sTrap = rfc1155.Integer(specificTrap)
         ts = rfc1155.TimeTicks( self.getSysUptime() )
@@ -176,7 +180,14 @@ class SNMP:
             community string.
         """
 
-    def receiveData(self, data):
+#    def handleResponse(self, manager, cb_ctx, (response, src), (exc_type, exc_value, exc_traceback) ):
+#        """ This method is used as a callback for asynrole.manager
+#            for what to do when it receives data and reads it off
+#            the socket.
+#        """
+#        self.receiveData(response)
+
+    def receiveData(self, manager, cb_ctx, (data, src), (exc_type, exc_value, exc_traceback) ):
         """ This method should be called when data is received
             from a remote host.
         """
@@ -222,22 +233,18 @@ class SNMP:
             and send pending requests
         """
         while 1:
-            # send any pending outbound messages
             try:
+                # send any pending outbound messages
                 request = self.outbound.get(0)
-                self.sock.sendto( request[0].encode(), request[1] )
+                self.send( request[0].encode(), request[1] )
+
+                # check for inbound messages
+                self.poll()
 
             except Queue.Empty:
                 if self.queueEmpty:
                     self.queueEmpty(self)
                 pass
-
-            # see if there's anything inbound
-            try:
-                (inlist, outlist, errlist) = select.select( [self.sock], [], [], self.timeout )
-                if inlist:
-                    data = self.sock.recv(8096)
-                    self.receiveData( data )
 
             except:
                 raise

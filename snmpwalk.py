@@ -39,12 +39,11 @@ def checkResponse(snmpClient, msg):
     """
     pdu = msg.data
 
-    if int(msg.data.errorStatus) != 0:
-        print 'Error: %s' % msg.data.errorStatus
+    if int(pdu.errorStatus) != 0:
+        print 'Error: %s' % pdu.errorStatus
     else:
         unwrapVarBinds(pdu.varBindList)
 
-        # Do a getNext
         myClient.snmpGetNext(pdu.varBindList, remotesite, checkResponse, community=args[1])
 
 def unwrapVarBinds(varBindList):
@@ -55,33 +54,17 @@ def unwrapVarBinds(varBindList):
 #    print '%s' % varBindList[0].objectValue.value
     print '%s = %s: %s' % ( varBindList[0].objectID, varBindList[0].objectValue.__class__.__name__, varBindList[0].objectValue )
 
-def getData():
-    (inlist, outlist, errlist) = select.select( [sock], [], [] )
-    if inlist:
-        data = sock.recv(8096)
-    #    log.debug('got data: %s' % util.octetsToHex(data) )
-        msg = rfc1157.Message().decode(data)
-    #    log.debug('message recvd: %s' % msg)
-
-        checkResponse(msg)
-
 # What to do when we finish
 def whenDone(snmpClient):
     sys.exit(0)
 
 # Main bits
 
-#log = logging.getLogger('ping-snmpd')
-
 # Read command line
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
 # Probably replace with something that assigns a random port
-myClient = v1.SNMP( ('localhost', 9999), whenDone )
-
-#remotesite = ( 'localhost', 161 )
-#myClient.snmpGet('.1.3.6.1.2.1.1.1.0', remotesite, checkResponse)
-#myClient.snmpGet('.1.3.6.1.2.1.1.3.0', remotesite, checkResponse)
+myClient = v1.SNMP( whenDone )
 
 if len(args) != 3:
     print "Usage: snmpget.py <server> <community> <oid>"
@@ -89,7 +72,5 @@ if len(args) != 3:
 else:
     remotesite = ( args[0], 161 )
     myClient.snmpGet(args[2], remotesite, checkResponse, community=args[1])
-
-#myClient.snmpGet('.1.3.6.1.2.1.1.4.0', remotesite, checkResponse)
 
 myClient.run()
