@@ -58,9 +58,7 @@ class SNMP(v1.SNMP):
         objID = rfc1155.ObjectID(oid)
         val = rfc1155.Null()
         varbindlist = rfc1905.VarBindList( [ rfc1157.VarBind(objID, val) ] )
-        log.debug('varbindlist: %s' % varbindlist)
         pdu = self.createGetRequestPDU( varbindlist )
-        log.debug('pdu: %s' % pdu)
         return rfc1905.Message( community=community, data=pdu )
 
     def createGetNextRequestMessage(self, varbindlist, community='public'):
@@ -89,7 +87,6 @@ class SNMP(v1.SNMP):
         ts = rfc1155.TimeTicks( self.getSysUptime() )
 
         pdu = rfc1157.TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
-#        log.debug('v1.trap is %s' % pdu)
         return pdu
 
     def snmpGet(self, oid, remote, callback, community='public'):
