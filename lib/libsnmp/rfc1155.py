@@ -48,7 +48,7 @@ asnTagNumbers = {
     'Sequence':     0x10,
 
 # Application types
-    'IPAdrress':        0x00,
+    'IPAddress':        0x00,
     'Counter':          0x01,
     'Guage':            0x02,
     'TimeTicks':        0x03,
@@ -87,7 +87,7 @@ class Asn1Object:
         result = ''.join(resultlist)
         
         return result
-
+    
     def decode(self, stream):
         """ decode() an octet stream into a sequence of Asn1Objects
             This method should be overridden by subclasses to define
@@ -99,6 +99,9 @@ class Asn1Object:
             Attempts to decode() an unknown object type result in an
             error.
         """
+        if type(stream) != types.StringType:
+            raise TypeError
+        
         objects = []
         while len(stream) > 0:
             
@@ -269,11 +272,12 @@ class Asn1Object:
 
 class Integer(Asn1Object):
     """An ASN.1 Integer type"""
+    
     asnTagNumber = asnTagNumbers['Integer']
     
     MINVAL = -2147483648L
     MAXVAL =  2147483647L
-
+    
     def __init__(self, value=0L):
         Asn1Object.__init__(self)
         if not self.MINVAL <= value <= self.MAXVAL:
@@ -745,7 +749,10 @@ class IPAddress(OctetString):
         It represents a 32-bit internet address as an
         OctetString of length 4, in network byte order.
     """
-
+    
+    #asnTagClass = asnTagClasses['APPLICATION']    
+    #asnTagNumber = asnTagNumbers['IPAddress']
+    
     def __init__(self, value=''):
         OctetString.__init__(self, value)
 
@@ -781,12 +788,16 @@ class NetworkAddress(IPAddress):
     pass
 
 class Counter(Integer):
-    """ A counter starts at zero and keeps going to a maximum
-        integer value of 2^32-1 where it wraps back to zero.
-    """
+
+    """A counter starts at zero and keeps going to a maximum integer
+    value of 2^32-1 where it wraps back to zero.  """
+    
+    #asnTagClass = asnTagClasses['APPLICATION']
+    #asnTagNumber = asnTagNumbers['Counter']
+    
     MINVAL = 0L
     MAXVAL = 4294967295L
-
+    
     def __add__(self, val):
         """ We only add to a counter, and we check for a wrap condition
         """
@@ -816,13 +827,16 @@ class Counter(Integer):
     pass
 
 class Guage(Integer):
-    """ A Guage is a non negative integer.
-        It may increase or decrease.
-        It latches at a maximum value.
-    """
+
+    """A Guage is a non negative integer.  It may increase or
+    decrease.  It latches at a maximum value."""
+    
+    #asnTagClass = asnTagClasses['APPLICATION']
+    #asnTagNumber = asnTagNumbers['Guage']
+    
     MINVAL = 0
     MAXVAL = 4294967295L
-
+    
     def __add__(self, val):
         """ Add to the Guage, latching at the maximum
         """
@@ -843,11 +857,13 @@ class Guage(Integer):
     pass
 
 class TimeTicks(Integer):
-    """ TimeTicks is the number of hundredths of a second
-        since an epoch, specified at object creation time
-    """
+    
+    """ TimeTicks is the number of hundredths of a second since an
+    epoch, specified at object creation time """
+
     asnTagClass = asnTagClasses['APPLICATION']
     asnTagNumber = asnTagNumbers['TimeTicks']
+    
     # Default to unix epoch
     epoch = 'Jan 1 1970'
     MINVAL = 0
