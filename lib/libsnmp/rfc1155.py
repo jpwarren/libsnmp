@@ -14,7 +14,6 @@ import util
 import debug
 import logging
 import types
-from string import split
 
 log = logging.getLogger('Asn1Object')
 
@@ -249,11 +248,38 @@ class Asn1Object:
 
     def encodeEndOfContents(self):
         return '\000\000'
+    
+    ##
+    ## 
+    def __eq__(self, other):
+        
+        """Compare two instance by comparison of their value fields
+        only"""
+
+        return isinstance(other, self.__class__) and self.value == other.value
+    
+    ##
+    ##
+    def __ne__(self, other):
+        
+        """Compare two objects for inequality"""
+        
+        return not (self == other)
+    
+    ##
+    ##
+    def __len__(self):
+        
+        """Return the length of the value field"""
+        
+        return len(self.value)
+    
+    pass
 
 class Integer(Asn1Object):
-    """ An ASN.1 Integer type
-    """
+    """An ASN.1 Integer type"""
     asnTagNumber = asnTagNumbers['Integer']
+    
     MINVAL = -2147483648L
     MAXVAL =  2147483647L
 
@@ -482,7 +508,7 @@ class ObjectID(Asn1Object):
 
         if type(value) == types.StringType:
             
-            vals = split(value, '.')
+            vals = value.split('.')
             if vals[0] != '':
                 raise ValueError('ObjectID string must be in leading dot form')
             self.value = []
@@ -508,23 +534,6 @@ class ObjectID(Asn1Object):
         else:
             return ''
         pass
-    
-    def __eq__(self, other):
-
-        """Compare the values of two instances"""
-        
-        if isinstance(other, self.__class__):
-            return self.value == other.value
-        else:
-            return False
-        pass
-    
-    def __len__(self):
-        """Return the length of the value"""
-        return len(self.value)
-    
-    def __ne__(self, other):
-        return not (self == other)
     
     def isPrefixOf(self, other):
         """ Compares this ObjectID with another ObjectID and
@@ -742,7 +751,7 @@ class IPAddress(OctetString):
             pass
         elif type(value) == types.StringType:
             self.value = ''
-            listform = split(value, '.')
+            listform = value.split('.')
             if len(listform) != 4:
                 raise ValueError('IPAddress must be of length 4')
             
