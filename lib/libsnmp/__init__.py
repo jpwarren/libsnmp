@@ -18,5 +18,15 @@
 #    License along with this library; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-__all__ = [ 'debug', 'util', 'rfc1155', 'rfc1157' ]
+__all__ = [
+    'asynrole',
+    'debug',
+    'util',
+    'rfc1155',
+    'rfc1157',
+    'rfc1902',
+    'rfc1905',
+    'v1',
+    'v2',
+    ]
 

@@ -216,7 +216,7 @@ class TrapPDU(Sequence):
         self.specificTrap = specificTrap    # Integer
         self.timestamp = timestamp          # TimeTicks
         self.varBindList = varBindList      # VarBindList
-
+        
         self.value = []
         self.value.append(self.enterprise)
         self.value.append(self.agentAddr)
