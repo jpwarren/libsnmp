@@ -838,7 +838,7 @@ class IPAddress(OctetString):
             if len(value) != 4:
                 raise ValueError('IPAddress must be of length 4')
             pass
-        elif value is None:
+        else:
             self.value = ''
             pass
         return
