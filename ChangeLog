@@ -1,0 +1,8 @@
+# $Id$
+# Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
+# All Rights Reserved
+#
+
+0.0.1     2003-08-13  Justin Warren <daedalus@eigenmagic.com>
+
+    - First version of libsnmp
