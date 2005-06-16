@@ -18,7 +18,7 @@
 #    License along with this library; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-- Fix unittests to cope with modification to library code.
 - Add more unittests to test all scenarios. This will form the core of
   the regression test suite.
-- Add SNMPv2 support.
+- Modify snmpmanager.py to use v1 and v2 instead of directly using
+  the rfc11*.py code.

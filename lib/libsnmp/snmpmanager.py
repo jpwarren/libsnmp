@@ -36,6 +36,9 @@ from libsnmp import asynrole
 from libsnmp import rfc1157
 from libsnmp import rfc1905
 
+from libsnmp import v1
+from libsnmp import v2
+
 log = logging.getLogger('snmp-manager')
 
 ## Used in typeSetter()
@@ -177,26 +180,41 @@ class snmpManager(asynrole.manager):
 
         return message
 
-    def createTrapMessage(self, pdu, community='public'):
+    def createTrapMessage(self, pdu, community='public', version=2):
         """ Creates a message object from a pdu and a
             community string.
         """
-        return Message( community=community, data=pdu )
+        if version == 1:
+            return v1.createTrapMessage( community=community, data=pdu )
+        elif version == 2:
+            return v2.createTrapMessage( community=community, data=pdu )
 
-    def createTrapPDU(self, varbindlist, enterprise='.1.3.6.1.4', agentAddr=None, genericTrap=6, specificTrap=0):
+    def createTrapPDU(self, varbindlist, version=2, enterprise='.1.3.6.1.4', agentAddr=None, genericTrap=6, specificTrap=0):
         """ Creates a Trap PDU object from a list of strings and integers
             along with a varBindList to make it a bit easier to build a Trap.
         """
-        ent = ObjectID(enterprise)
-        if not agentAddr:
-            agentAddr = self.sock.getsockname()[0]
-        agent = NetworkAddress(agentAddr)
-        gTrap = GenericTrap(genericTrap)
-        sTrap = Integer(specificTrap)
-        ts = TimeTicks( self.getSysUptime() )
+        if agentAddr is None:
+            agentAddr = self.getsockname()[0]
+            pass
 
-        pdu = TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
+        if version == 1:
+            ent = rfc1157.ObjectID(enterprise)
+            agent = rfc1157.NetworkAddress(agentAddr)
+            gTrap = rfc1157.GenericTrap(genericTrap)
+            sTrap = rfc1157.Integer(specificTrap)
+            ts = rfc1157.TimeTicks( self.getSysUptime() )
+            pdu = rfc1157.TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
 #        log.debug('v1.trap is %s' % pdu)
+
+        elif version == 2:
+            ent = rfc1905.ObjectID(enterprise)
+            agent = rfc1905.NetworkAddress(agentAddr)
+            gTrap = rfc1157.GenericTrap(genericTrap)
+            sTrap = rfc1905.Integer(specificTrap)
+            ts = rfc1905.TimeTicks( self.getSysUptime() )
+            pdu = rfc1157.TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
+            pass
+        
         return pdu
 
     def snmpGet(self, oid, remote, callback, community='public', version=2):
@@ -247,10 +265,10 @@ class snmpManager(asynrole.manager):
         self.callbacks[msg.data.requestID] = callback
         return msg.data.requestID
 
-    def snmpTrap(self, remote, trapPDU, community='public'):
+    def snmpTrap(self, remote, trapPDU, community='public', version=2):
         """ Queue up a trap for sending
         """
-        msg = self.createTrapMessage(trapPDU, community)
+        msg = self.createTrapMessage(trapPDU, community, version)
 
         self.outbound.put( (msg, remote) )
 
@@ -268,28 +286,22 @@ class snmpManager(asynrole.manager):
         # callback from my list of callbacks, passing it the
         # message and a reference to myself
 
-        try:
-            # Decode the data into a message
-            msg = rfc1905.Message().decode(data)
+        # Decode the data into a message
+        msg = rfc1905.Message().decode(data)
 
-            # Decode it based on what version of message it is
-            if msg.version == 0:
-                if __debug__: log.debug('Detected SNMPv1 message')
-                self.handleV1Message(msg)
+        # Decode it based on what version of message it is
+        if msg.version == 0:
+            if __debug__: log.debug('Detected SNMPv1 message')
+            self.handleV1Message(msg)
 
-            elif msg.version == 1:
-                if __debug__: log.debug('Detected SNMPv2 message')
-                self.handleV2Message(msg)
+        elif msg.version == 1:
+            if __debug__: log.debug('Detected SNMPv2 message')
+            self.handleV2Message(msg)
 
-            else:
-                log.error('Unknown message version %d detected' % msg.version)
-                log.error('version is a %s' % msg.version() )
-                raise ValueError('Unknown message version %d detected' % msg.version)
-        # log any errors in callback
-        except Exception, e:
-#            log.error('Exception in callback: %s: %s' % (self.callbacks[int(msg.data.requestID)].__name__, e) )
-            log.error('Exception in receiveData: %s' % e )
-            raise
+        else:
+            log.error('Unknown message version %d detected' % msg.version)
+            log.error('version is a %s' % msg.version() )
+            raise ValueError('Unknown message version %d detected' % msg.version)
 
     def handleV1Message(self, msg):
         """ Handle reception of an SNMP version 1 message 
@@ -330,17 +342,18 @@ class snmpManager(asynrole.manager):
         return '.1.3.6.1.2.1.' + partialOID
 
     def run(self):
-        """ Listen for incoming request thingies
-            and send pending requests
+        """
+        Listen for incoming request thingies
+        and send pending requests
         """
         while 1:
             try:
+                # check for inbound messages
+                self.poll()
+
                 # send any pending outbound messages
                 request = self.outbound.get(0)
                 self.send( request[0].encode(), request[1] )
-
-                # check for inbound messages
-                self.poll()
 
             except Queue.Empty:
                 if self.queueEmpty:

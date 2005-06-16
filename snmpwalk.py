@@ -32,7 +32,7 @@ from libsnmp import util
 from libsnmp import rfc1155
 from libsnmp import rfc1157
 
-from libsnmp import v1
+from libsnmp import snmpmanager
 
 def checkResponse(snmpClient, msg):
     """ Quick and dirty print of what the message contains
@@ -53,7 +53,9 @@ def unwrapVarBinds(varBindList):
 #    print '%s' % varBindList[0].objectID
 #    print '%s' % varBindList[0].objectValue.value
     print '%s = %s: %s' % ( varBindList[0].objectID, varBindList[0].objectValue.__class__.__name__, varBindList[0].objectValue )
-
+    if varBindList[0].objectValue.__class__.__name__ == 'NoSuchObject':
+        sys.exit(0)
+        
 # What to do when we finish
 def whenDone(snmpClient):
     sys.exit(0)
@@ -64,7 +66,7 @@ def whenDone(snmpClient):
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
 # Probably replace with something that assigns a random port
-myClient = v1.SNMP( whenDone )
+myClient = snmpmanager.snmpManager( whenDone )
 
 if len(args) != 3:
     print "Usage: snmpget.py <server> <community> <oid>"

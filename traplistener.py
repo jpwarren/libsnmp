@@ -32,13 +32,12 @@ from libsnmp import util
 from libsnmp import rfc1155
 from libsnmp import rfc1157
 
-from libsnmp import v1
+from libsnmp import v2
 
 def checkResponse(snmpClient, msg):
     """ Quick and dirty print of what the message contains
     """
     pdu = msg.data
-
     unwrapVarBinds(pdu.varBindList)
 
 def unwrapVarBinds(varBindList):
@@ -59,15 +58,5 @@ def whenDone(snmpClient):
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
 # Listen on SNMP trap port
-myClient = v1.SNMP( ('localhost', 9999), trapCallback=checkResponse )
-
-#if len(args) != 3:
-#    print "Usage: snmpget.py <server> <community> <oid>"
-#    sys.exit(1)
-#else:
-#    remotesite = ( args[0], 161 )
-#    myClient.snmpGet(args[2], remotesite, checkResponse, community=args[1])
-
-#myClient.snmpGet('.1.3.6.1.2.1.1.4.0', remotesite, checkResponse)
-
+myClient = v2.SNMP( ('localhost', 9999), trapCallback=checkResponse)
 myClient.run()

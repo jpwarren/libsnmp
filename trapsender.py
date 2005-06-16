@@ -32,11 +32,11 @@ from libsnmp import util
 from libsnmp import rfc1155
 from libsnmp import rfc1157
 
-from libsnmp import v1
+from libsnmp import v2
 
 import time
 
-sleeptime = 5
+sleeptime = 1
 microsleep = 0.1
 
 lasttime = 0
@@ -60,8 +60,7 @@ def whenDone(snmpClient):
     trapPDU = snmpClient.createTrapPDU( varbindlist )
 #    print('pdu: %s' % trapPDU)
 
-## Send to SNMP port. We use a different port number for testing.
-    print "sending trap..."
+## Send to SNMP trap port.
     snmpClient.snmpTrap( ('localhost', 9999), trapPDU )
 
 # Main bits
@@ -69,7 +68,7 @@ def whenDone(snmpClient):
 # Read command line
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
-# Probably replace with something that assigns a random port
-myClient = v1.SNMP( ('localhost', 8888), whenDone )
+# create an snmpmanager
+myClient = v2.SNMP( ('localhost', 8888), whenDone )
 
 myClient.run()

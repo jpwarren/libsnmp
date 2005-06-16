@@ -25,7 +25,7 @@ import time
 
 version_major = 1
 version_minor = 0
-version_build = 2
+version_build = 3
 version_devel=''
 #version_devel='-dev-' + time.strftime('%Y-%m-%d-%H%M')
 
@@ -36,7 +36,7 @@ setup(
     version=version,
     description='An SNMP library',
     author='Justin Warren',
-    author_email='daedalus@eigenmagic.com',
+    author_email='justin.warren@unicity.com.au',
     license='Proprietary',
     url='http://www.unicity.com.au/',
     packages=['libsnmp'],

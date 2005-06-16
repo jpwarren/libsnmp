@@ -82,11 +82,11 @@ class rfc1157Test(unittest.TestCase):
         myVarBindList = rfc1157.VarBindList( myList )
 
 #        self.log.debug('myvarlist: %s' % myVarBindList)
-        obj = rfc1157.GetRequestPDU(5, varBindList=myVarBindList)
+        obj = rfc1157.Get(5, varBindList=myVarBindList)
 #        self.log.debug('obj: %s: %s' % (obj.__class__, obj) )
         octets = obj.encode()
 #        self.log.debug('octets: %s' % util.octetsToHex(octets) )
-        objectList = rfc1157.RequestPDU().decode(octets)
+        objectList = rfc1157.PDU().decode(octets)
 #        for item in objectList:
 #            self.log.debug('item: %s: %s' % (item.__class__, item) )
 
@@ -98,11 +98,11 @@ class rfc1157Test(unittest.TestCase):
                 rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
-        obj = rfc1157.GetNextRequestPDU(5, varBindList=myVarBindList)
+        obj = rfc1157.GetNext(5, varBindList=myVarBindList)
 #        self.log.debug('obj: %s: %s' % (obj.__class__, obj) )
         octets = obj.encode()
 #        self.log.debug('octets: %s' % util.octetsToHex(octets) )
-        objectList = rfc1157.RequestPDU().decode(octets)
+        objectList = rfc1157.PDU().decode(octets)
 #        for item in objectList:
 #            self.log.debug('item: %s: %s' % (item.__class__, item) )
 
@@ -114,11 +114,11 @@ class rfc1157Test(unittest.TestCase):
                 rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
-        obj = rfc1157.GetResponsePDU(5, varBindList=myVarBindList)
+        obj = rfc1157.Response(5, varBindList=myVarBindList)
 #        self.log.debug('obj: %s: %s' % (obj.__class__, obj) )
         octets = obj.encode()
 #        self.log.debug('octets: %s' % util.octetsToHex(octets) )
-        objectList = rfc1157.RequestPDU().decode(octets)
+        objectList = rfc1157.PDU().decode(octets)
 #        for item in objectList:
 #            self.log.debug('item: %s: %s' % (item.__class__, item) )
 
@@ -130,11 +130,11 @@ class rfc1157Test(unittest.TestCase):
                 rfc1155.Sequence([ rfc1155.OctetString('blah'), rfc1155.NetworkAddress('10.232.8.6') ]) ) )
         myVarBindList = rfc1157.VarBindList( myList )
 #        self.log.debug('myvarlist: %s' % myVarBindList)
-        obj = rfc1157.SetRequestPDU(5, varBindList=myVarBindList)
+        obj = rfc1157.Set(5, varBindList=myVarBindList)
 #        self.log.debug('obj: %s: %s' % (obj.__class__, obj) )
         octets = obj.encode()
 #        self.log.debug('octets: %s' % util.octetsToHex(octets) )
-        objectList = rfc1157.RequestPDU().decode(octets)
+        objectList = rfc1157.PDU().decode(octets)
 #        for item in objectList:
 #            self.log.debug('item: %s: %s' % (item.__class__, item) )
 
