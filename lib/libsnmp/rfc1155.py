@@ -31,6 +31,7 @@ import util
 import debug
 import logging
 import types
+import copy
 
 log = logging.getLogger('Asn1Object')
 
@@ -289,6 +290,12 @@ class Asn1Object:
         """Compare two objects for inequality"""
         
         return not (self == other)
+    
+    ##
+    ##
+    def toObjectID(self):
+        raise TypeError
+    
     pass
 
 class Integer(Asn1Object):
@@ -505,7 +512,11 @@ class Integer(Asn1Object):
             pass
         
         return val
-
+    
+    ##
+    ##
+    def toObjectID(self):
+        return ObjectID([self.value])
     pass
 
 class OctetString(Asn1Object):
@@ -517,7 +528,7 @@ class OctetString(Asn1Object):
     
     def __init__(self, value=''):
         Asn1Object.__init__(self)
-        self.value = value
+        self.value = copy.copy(value)
         return
     
     def __str__(self):
@@ -543,7 +554,9 @@ class OctetString(Asn1Object):
     def __oct__(self):
         
         return ''.join( [ '%3o' % ord(x) for x in self.value ] )
-
+    
+    def toObjectID(self):
+        return ObjectID([ ord(x) for x in self.value])
     pass
 
 
@@ -575,9 +588,9 @@ class ObjectID(Asn1Object):
                 self.value.append(number)
                 pass
             pass
-            
+        
         elif type(value) == types.ListType or type(value) == types.NoneType:
-            self.value = value
+            self.value = copy.copy(value)
             
         elif type(value) == types.TupleType:
             self.value = list(value)
@@ -742,6 +755,10 @@ class ObjectID(Asn1Object):
             pass
         
         return self
+    
+    def toObjectID(self):
+        return ObjectID(copy.copy(self.value))
+    
     pass
 
 class Null(Asn1Object):
@@ -843,7 +860,7 @@ class SequenceOf(Sequence):
     asnTagFormat = asnTagFormats['CONSTRUCTED']
     asnTagNumber = asnTagNumbers['Sequence']
     
-    def __init__(self, componentType=Asn1Object, value=[]):
+    def __init__(self, componentType=Asn1Object, value=None):
         Sequence.__init__(self)
         self.componentType = componentType
         
@@ -851,8 +868,10 @@ class SequenceOf(Sequence):
         ## checks each one to ensure it is of the correct type.
         
         self.value = []
-        for item in value:
-            self.append(item)
+        if value:
+            for item in value:
+                self.append(item)
+                pass
             pass
         return
     
@@ -909,6 +928,12 @@ class IPAddress(OctetString):
             result.append( '%d' % ord(item) )
             pass
         return '.'.join(result)
+    
+    ##
+    ##
+    def toObjectID(self):
+        return ObjectID( [ ord(x) for x in self.value ] )
+    
     pass
 
 class NetworkAddress(IPAddress):

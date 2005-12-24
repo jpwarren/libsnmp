@@ -1,3 +1,4 @@
+
 2005-06-16  Justin Warren <justin.warren@unicity.com.au>
 	* Fixed minor bug in snmpwalk.
 	* Changed traplistener and trapsender to use v2c SNMP via
@@ -5,7 +6,14 @@
 	* Fixed bug in snmpmanager relating to the order in which
 	messages are sent and received.
 	* Fixed test_rfc1157.py to match new rfc1157 code.
-	
+
+2005-04-25  Jim Crumpler  <jgc@slug.jgc.unicity.com.au>
+
+	* lib/libsnmp/rfc1155.py (asnTagNumbers): added toObjectID()
+	function to Asn1Objects (for encoding as an index)
+	* Fixed problems with __init__ stealing a reference to passed
+	object.
+
 2004-12-21  Jim Crumpler  <jgc@slug.jgc.unicity.com.au>
 
 	* lib/libsnmp/rfc1155.py (ObjectID.__getitem__): supported
