@@ -1,4 +1,6 @@
-
+2006-06-20  Justin Warren <justin.warren@unicity.com.au>
+	* Added basic debian package build files.
+	
 2005-06-16  Justin Warren <justin.warren@unicity.com.au>
 	* Fixed minor bug in snmpwalk.
 	* Changed traplistener and trapsender to use v2c SNMP via

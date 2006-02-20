@@ -42,10 +42,10 @@ setup(
     packages=['libsnmp'],
     package_dir = { '':'lib'},
     
-    scripts = ['snmpget.py', 
-               'snmpwalk.py',
-               'snmpset.py',
-               'traplistener.py', 
-               'trapsender.py',
-               ],
+##     scripts = ['snmpget.py', 
+##                'snmpwalk.py',
+##                'snmpset.py',
+##                'traplistener.py', 
+##                'trapsender.py',
+##                ],
     )

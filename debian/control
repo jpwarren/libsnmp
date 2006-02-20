@@ -5,7 +5,7 @@ Maintainer: Justin Warren <libsnmp@unicity.com.au>
 Build-Depends:
 Standards-Version: 3.6.2
 
-Package: python-libsnmp
+Package: python2.3-libsnmp
 Architecture: any
 Depends: 
 Description: A pure Python SNMP library.

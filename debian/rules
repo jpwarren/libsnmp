@@ -9,7 +9,9 @@
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
-
+ifeq ($(PYTHON),)
+	PYTHON = /usr/bin/python
+endif
 
 
 CFLAGS = -Wall -g
@@ -63,12 +65,12 @@ install: build
 	dh_installdirs
 
 	# Add here commands to install the package into debian/tmp
-	python setup.py install --prefix=debian/tmp
+	$(PYTHON) setup.py install --root=debian/tmp
 
 
 # Build architecture-independent files here.
 binary-indep: build install
-	python setup.py build
+
 
 # Build architecture-dependent files here.
 binary-arch: build install
