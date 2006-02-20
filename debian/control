@@ -1,0 +1,12 @@
+Source: python-libsnmp
+Section: devel
+Priority: optional
+Maintainer: Justin Warren <libsnmp@unicity.com.au>
+Build-Depends:
+Standards-Version: 3.6.2
+
+Package: python-libsnmp
+Architecture: any
+Depends: 
+Description: A pure Python SNMP library.
+ python-libsnmp implements SNMPv1 and SNMPv2c as a pure Python library.
