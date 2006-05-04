@@ -6,7 +6,16 @@ Build-Depends:
 Standards-Version: 3.6.2
 
 Package: python2.3-libsnmp
+Provides: python-libsnmp
 Architecture: any
-Depends: 
+Depends: ${python:Depends}
 Description: A pure Python SNMP library.
  python-libsnmp implements SNMPv1 and SNMPv2c as a pure Python library.
+
+Package: python2.4-libsnmp
+Provides: python-libsnmp
+Architecture: any
+Depends: ${python:Depends}
+Description: A pure Python SNMP library.
+ python-libsnmp implements SNMPv1 and SNMPv2c as a pure Python library.
+
