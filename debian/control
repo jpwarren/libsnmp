@@ -2,7 +2,7 @@ Source: python-libsnmp
 Section: devel
 Priority: optional
 Maintainer: Justin Warren <libsnmp@unicity.com.au>
-Build-Depends:
+Build-Depends: debhelper (>=4.1.67), python2.3, python2.4, python2.3-dev, python2.4-dev
 Standards-Version: 3.6.2
 
 Package: python-libsnmp
