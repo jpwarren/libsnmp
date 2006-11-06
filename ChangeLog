@@ -1,3 +1,8 @@
+2006-10-07  Justin Warren <daedalus@eigenmagic.com>
+	* Re-assigned copyright to Justin Warren.
+	* License changed to MIT license instead of LGPL.
+	* Version updated to 2.0.0
+
 2006-06-20  Justin Warren <justin.warren@unicity.com.au>
 	* Added basic debian package build files.
 	
