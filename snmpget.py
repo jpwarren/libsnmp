@@ -37,6 +37,8 @@ def unwrapVarBinds(varBindList):
 #    print '%s' % varBindList[0].objectID
 #    print '%s' % varBindList[0].objectValue
     print '%s = %s: (%s) %s' % ( varBindList[0].objectID, varBindList[0].objectValue.__class__.__name__, varBindList[0].objectValue, varBindList[0].objectValue )
+    if varBindList[0].objectValue.__class__.__name__ == 'OctetString':
+        print "   hex: %s" % util.octetsToHex(varBindList[0].objectValue.value)
 
 # What to do when we finish
 def whenDone(snmpClient):

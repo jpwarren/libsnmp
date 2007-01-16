@@ -38,8 +38,17 @@ def unwrapVarBinds(varBindList):
 #    print '%s' % varBindList
 #    print '%s' % varBindList[0].objectID
 #    print '%s' % varBindList[0].objectValue.value
+
     print '%s = %s: %s' % ( varBindList[0].objectID, varBindList[0].objectValue.__class__.__name__, varBindList[0].objectValue )
+    if varBindList[0].objectValue.__class__.__name__ == 'OctetString':
+        print "   hex: %s" % util.octetsToHex(varBindList[0].objectValue.value)
+    
     if varBindList[0].objectValue.__class__.__name__ == 'NoSuchObject':
+        log.error("No such object!")
+        sys.exit(0)
+
+    if varBindList[0].objectValue.__class__.__name__ == 'EndOfMibView':
+        log.info("End of MIB View")
         sys.exit(0)
         
 # What to do when we finish

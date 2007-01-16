@@ -277,11 +277,11 @@ class snmpManager(asynrole.manager):
 
         # Decode it based on what version of message it is
         if msg.version == 0:
-            if __debug__: log.debug('Detected SNMPv1 message')
+#            if __debug__: log.debug('Detected SNMPv1 message')
             self.handleV1Message(msg)
 
         elif msg.version == 1:
-            if __debug__: log.debug('Detected SNMPv2 message')
+#            if __debug__: log.debug('Detected SNMPv2 message')
             self.handleV2Message(msg)
 
         else:
