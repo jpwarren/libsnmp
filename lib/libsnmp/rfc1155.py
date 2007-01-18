@@ -570,7 +570,7 @@ class ObjectID(Asn1Object):
             for subid in subidlist:
                 number = int(subid)
                 if number < 0 or number > 0x7FFFFFFF:
-                    raise ValueError("SubID our of range")
+                    raise ValueError("SubID out of range")
                 self.value.append(number)
                 pass
             pass
