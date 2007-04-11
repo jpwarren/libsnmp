@@ -1,3 +1,10 @@
+python-libsnmp (2.0.1-1) unstable; urgency=low
+
+  * Minor bugfix in rfc1905.py after feedback from Phil Mayers
+  * Changed example scripts to use any available python, not just 2.3
+	
+ -- Justin Warren <daedalus@eigenmagic.com>  Wed, 11 Apr 2007 14:52:30 +1000
+
 python-libsnmp (2.0.0-1) unstable; urgency=low
 
   * Repackage with MIT license.

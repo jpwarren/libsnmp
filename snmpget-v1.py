@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.3
+#!/usr/bin/python
 # $Id$
 # $Revision$
 #
@@ -12,7 +12,6 @@ import select
 import getopt
 
 import sys
-sys.path.append('lib')
 from libsnmp import debug
 from libsnmp import util
 from libsnmp import rfc1155

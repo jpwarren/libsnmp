@@ -1,3 +1,7 @@
+2007-04-11  Justin Warren <daedalus@eigenmagic.com>
+	* Minor bugfix in rfc1905.py after feedback from Phil Mayers
+	* Changed example scripts to use any available python, not just 2.3
+	
 2006-10-07  Justin Warren <daedalus@eigenmagic.com>
 	* Re-assigned copyright to Justin Warren.
 	* License changed to MIT license instead of LGPL.

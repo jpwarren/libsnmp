@@ -149,7 +149,7 @@ class BulkPDU(Sequence):
         self.value = [
             self.requestID,
             self.nonRepeaters,
-            self.maxRepetitons,
+            self.maxRepetitions,
             self.varBindList
         ]
 
