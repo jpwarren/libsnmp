@@ -43,6 +43,16 @@ class ErrorStatus(Integer):
         """
         return '%d: %s' % (self.value, self.errString[self.value])
 
+    def enum(self, num=None):
+        """
+        Return the stringified version of my enum.
+        If a specific number is passed in, use that,
+        otherwise, use my current value.
+        """
+        if num is None:
+            num = self.value
+        return self.errNum(num)
+
 class VarBind(Sequence):
     """ Variable Binding
         This binds a name to an object
@@ -170,7 +180,8 @@ class Set(PDU):
     asnTagNumber = asnTagNumbers['Set']
 
 class GenericTrap(Integer):
-    """ Generic Trap type
+    """
+    Generic Trap type
     """
     genericTraps = {
         0:      'coldStart',
@@ -186,6 +197,16 @@ class GenericTrap(Integer):
         """ Return an informative string instead of just a number
         """
         return '%s: %d (%s)' % (self.__class__.__name__, self.value, self.genericTraps[self.value])
+
+    def enum(self, num=None):
+        """
+        Return the stringified version of my enum.
+        If a specific number is passed in, use that,
+        otherwise, use my current value.
+        """
+        if num is None:
+            num = self.value
+        return self.genericTraps[num]
 
 class TrapPDU(Sequence):
     """ A Trap PDU
@@ -227,7 +248,7 @@ class TrapPDU(Sequence):
         for item in objectList[5]:
             myVarList.append( VarBind(item[0], item[1]) )
 
-        return self.__class__( objectList[0], objectList[1], int(objectList[2]), int(objectList[3]), objectList[4], myVarList)
+        return self.__class__( objectList[0], objectList[1], GenericTrap(int(objectList[2])), objectList[3], objectList[4], myVarList)
 
 # Add some new decode types
 tagDecodeDict[0xa0] = Get

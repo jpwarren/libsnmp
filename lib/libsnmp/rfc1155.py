@@ -309,6 +309,9 @@ class Integer(Asn1Object):
     def __int__(self):
         return int(self.value)
 
+    def __float__(self):
+        return float(self.value)
+
     def __long__(self):
         return self.value
 
@@ -1035,10 +1038,12 @@ class TimeTicks(Integer):
         return
     pass
 
-#    def __str__(self):
-#        """ Format the TimeTicks value into an actual
-#            time/date stamp based on the epoch.
-#        """
+    def __str__(self):
+        """
+        Format the TimeTicks value into an actual
+        time/date stamp based on the epoch.
+        """
+        # FIXME: Assumes an epoch of 1 Jan 1970
 
 class Opaque(OctetString):
 

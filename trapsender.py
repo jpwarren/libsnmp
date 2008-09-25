@@ -47,7 +47,7 @@ def whenDone(snmpClient):
 #    print('pdu: %s' % trapPDU)
 
 ## Send to SNMP trap port.
-    snmpClient.snmpTrap( ('localhost', 9999), trapPDU )
+    snmpClient.snmpTrap( ('localhost', 162), trapPDU )
 
 # Main bits
 
