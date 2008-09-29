@@ -62,5 +62,5 @@ def whenDone(snmpClient):
 options, args = getopt.getopt(sys.argv[1:], '', [])
 
 # Listen on SNMP trap port
-myClient = v2.SNMP( ('localhost', 162), trapCallback=checkResponse)
+myClient = v2.SNMP( ('0.0.0.0', 162), trapCallback=checkResponse)
 myClient.run()
