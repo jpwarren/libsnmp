@@ -36,9 +36,12 @@ def checkResponse(snmpClient, msg):
         str(pdu.timestamp.value),
         ])
 
+    print frontbit
+
     for varbind in pdu.varBindList:
         endbit = "%s,%s" % ( varbind.objectID, varbind.objectValue )
-        print ",".join([ frontbit, endbit ])
+        print "  %s" % endbit
+        #print ",".join([ frontbit, endbit ])
 
     #endbit = unwrapVarBinds(pdu.varBindList)
 
