@@ -11,7 +11,7 @@ import time
 
 version_major = 2
 version_minor = 0
-version_build = 2
+version_build = 3
 version_devel=''
 #version_devel='-dev-' + time.strftime('%Y-%m-%d-%H%M')
 

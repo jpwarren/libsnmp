@@ -639,11 +639,13 @@ class ObjectID(Asn1Object):
     
     def isPrefixOf(self, other):
 
-        """Compares this ObjectID with another ObjectID and returns
-        non-None if this ObjectID is a prefix of the other one."""
+        """
+        Compares this ObjectID with another ObjectID and returns
+        non-None if this ObjectID is a prefix of the other one.
+        """
         
         if not isinstance(other, self.__class__):
-            raise TypeError('wrong type in comparison')
+            raise TypeError('Attempt to compared ObjectID with non-ObjectID')
         if len(other) < len(self):
             return False
         for i in range(len(self)):
