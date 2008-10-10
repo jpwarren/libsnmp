@@ -645,7 +645,7 @@ class ObjectID(Asn1Object):
         """
         
         if not isinstance(other, self.__class__):
-            raise TypeError('Attempt to compared ObjectID with non-ObjectID')
+            raise TypeError('Attempt to compare ObjectID with non-ObjectID: %s' % other.__repr__() )
         if len(other) < len(self):
             return False
         for i in range(len(self)):
