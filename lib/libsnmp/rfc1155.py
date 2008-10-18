@@ -586,6 +586,9 @@ class ObjectID(Asn1Object):
             
         elif type(value) == types.IntType:
             self.value = [value]
+
+        elif isinstance(ObjectID, value):
+            self.value = value.value[:]
             
         else:
             raise TypeError('unknown type passed as OID')
@@ -621,6 +624,12 @@ class ObjectID(Asn1Object):
     def __delitem__(self, key):
         self.value.__delitem__(key)
         return
+
+    def copy(self):
+        """
+        Return a copy of this object as a new object
+        """
+        return ObjectID(self.value)
     
     def append(self, subid):
         if type(subid) == types.IntType:

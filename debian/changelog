@@ -1,3 +1,10 @@
+python-libsnmp (2.0.3-1) unstable; urgency=low
+
+  * Added more information to the isPrefixOf TypeError raise
+  * Updated traplistener.py example code to use correct SNMP ports
+	
+ -- Justin Warren <daedalus@eigenmagic.com>  Sun, 19 Oct 2008 09:45:00 +1100
+
 python-libsnmp (2.0.1-1) unstable; urgency=low
 
   * Minor bugfix in rfc1905.py after feedback from Phil Mayers
