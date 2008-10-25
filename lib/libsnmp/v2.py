@@ -40,13 +40,19 @@ class SNMP(v1.SNMP):
         pdu = rfc1905.GetNext( reqID, varBindList=varbindlist )
         return pdu
 
-    def createGetRequestMessage(self, oid, community='public'):
-        """ Creates a message object from a pdu and a
-            community string.
+    def createGetRequestMessage(self, oidlist, community='public'):
         """
-        objID = rfc1155.ObjectID(oid)
-        val = rfc1155.Null()
-        varbindlist = rfc1905.VarBindList( [ rfc1157.VarBind(objID, val) ] )
+        Creates a message object from a pdu and a
+        community string.
+        @param oidlist: a list of oids to place in the message.
+        """
+        varbinds = []
+        for oid in oidlist:
+            objID = rfc1155.ObjectID(oid)
+            val = rfc1155.Null()
+            varbinds.append( rfc1157.VarBind(objID, val) )
+            pass
+        varbindlist = rfc1905.VarBindList( varbinds )
         pdu = self.createGetRequestPDU( varbindlist )
         return rfc1905.Message( community=community, data=pdu )
 

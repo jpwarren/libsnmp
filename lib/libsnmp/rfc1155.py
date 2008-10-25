@@ -587,7 +587,7 @@ class ObjectID(Asn1Object):
         elif type(value) == types.IntType:
             self.value = [value]
 
-        elif isinstance(ObjectID, value):
+        elif isinstance(value, ObjectID):
             self.value = value.value[:]
             
         else:
@@ -1049,12 +1049,13 @@ class TimeTicks(Integer):
         return
     pass
 
-    def __str__(self):
+    def _todo__str__(self):
         """
         Format the TimeTicks value into an actual
         time/date stamp based on the epoch.
         """
         # FIXME: Assumes an epoch of 1 Jan 1970
+        return ''
 
 class Opaque(OctetString):
 
