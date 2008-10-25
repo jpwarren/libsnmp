@@ -1,3 +1,11 @@
+python-libsnmp (2.0.4-1) feisty; urgency=low
+
+  * Fixed minor bug with isinstance parameter ordering in rfc1155.py
+  * Change API of v2.SNMP.createGetRequestMessage() to support
+    multiple OIDs, rather than just one.
+
+ -- Justin Warren <daedalus@eigenmagic.com>  Sun, 26 Oct 2008 09:30:11 +1100
+
 python-libsnmp (2.0.3-1) unstable; urgency=low
 
   * Added more information to the isPrefixOf TypeError raise
