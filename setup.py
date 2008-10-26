@@ -5,7 +5,8 @@
 #    libsnmp - a Python SNMP library
 #    Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 
-from distutils.core import setup
+from setuptools import setup
+#from distutils.core import setup
 
 import time
 
@@ -20,11 +21,7 @@ version='%d.%d.%d%s' % (version_major, version_minor, version_build, version_dev
 setup(
     name='libsnmp',
     version=version,
-    description='A Python SNMP library',
-    author='Justin Warren',
-    author_email='daedalus@eigenmagic.com',
-    license='MIT',
-    url='http://www.eigenmagic.com',
+
     packages=['libsnmp'],
     package_dir = { '':'lib'},
     
@@ -34,4 +31,28 @@ setup(
 ##                'traplistener.py', 
 ##                'trapsender.py',
 ##                ],
+
+    description='A Python SNMP library',
+    long_description='A pure Python implementation of the Simple Network Management Protocol',
+    author='Justin Warren',
+    author_email='daedalus@eigenmagic.com',
+    license='MIT',
+    url='http://www.eigenmagic.com',
+    download_url='http://www.seafelt.com/software/sources',
+
+    classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Other Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Topic :: Communications",
+    "Topic :: Internet",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Networking :: Monitoring",
+    ],
+
     )
