@@ -2,24 +2,23 @@ Source: python-libsnmp
 Section: devel
 Priority: optional
 Maintainer: Justin Warren <libsnmp@unicity.com.au>
-Build-Depends: debhelper (>=4.1.67), python2.3, python2.4, python2.3-dev, python2.4-dev
-Standards-Version: 3.6.2
+Build-Depends: debhelper (>=4.1.67), python2.4, python2.5, python2.4-dev, python2.5-dev
+Standards-Version: 4.1
 
 Package: python-libsnmp
 Architecture: any
-Depends: python (>= 2.3), python2.3-libsnmp (= ${Source-Version}) | python2.4-libsnmp (= ${Source-Version})
+Depends: python2.5-libsnmp (= ${Source-Version}) | python2.6-libsnmp (= ${Source-Version})
 Description: A pure Python SNMP library [dummy package]
  python-libsnmp implements SNMPv1 and SNMPv2c as a pure Python library.
 
-Package: python2.3-libsnmp
+Package: python2.5-libsnmp
 Architecture: any
-Depends: python2.3
-Description: A pure Python SNMP library [python2.3 version]
+Depends: python2.5
+Description: A pure Python SNMP library [python2.5 version]
  python-libsnmp implements SNMPv1 and SNMPv2c as a pure Python library.
 
-Package: python2.4-libsnmp
+Package: python2.6-libsnmp
 Architecture: any
-Depends: python2.4
-Description: A pure Python SNMP library [python2.4 version]
+Depends: python2.6
+Description: A pure Python SNMP library [python2.6 version]
  python-libsnmp implements SNMPv1 and SNMPv2c as a pure Python library.
-

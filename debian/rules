@@ -9,7 +9,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-PYVERSIONS=2.3 2.4
+PYVERSIONS=2.5
 # default is first version
 DEFAULTPY=$(shell echo $(PYVERSIONS) | sed 's/ .*//')
 
@@ -64,7 +64,7 @@ binary-indep: build install
 	dh_strip
 	dh_compress
 	dh_fixperms
-	dh_python
+	dh_pysupport
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol
@@ -81,7 +81,7 @@ binary-arch: build install
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
-	dh_python -a
+	dh_pysupport -a
 	dh_installdeb -a
 	dh_shlibdeps -a
 	dh_gencontrol -a
