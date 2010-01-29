@@ -75,7 +75,7 @@ class SNMP(v1.SNMP):
         """
         ent = rfc1155.ObjectID(enterprise)
         if not agentAddr:
-            agentAddr = self.sock.getsockname()[0]
+            agentAddr = self.getsockname()[0]
         agent = rfc1155.NetworkAddress(agentAddr)
         gTrap = rfc1157.GenericTrap(genericTrap)
         sTrap = rfc1155.Integer(specificTrap)

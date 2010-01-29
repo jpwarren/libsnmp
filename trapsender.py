@@ -22,9 +22,10 @@ from libsnmp import v2
 
 import time
 
-sleeptime = 1
+sleeptime = 5
 microsleep = 0.1
-
+endafter = 0
+finishat = time.time() + endafter
 lasttime = 0
 
 ##
@@ -43,11 +44,14 @@ def whenDone(snmpClient):
     varbindlist = rfc1157.VarBindList( [ varbind ] )
 #    print 'varbindlist: %s' % varbindlist
 
-    trapPDU = snmpClient.createTrapPDU( varbindlist )
+    trapPDU = snmpClient.createTrap( varbindlist )
 #    print('pdu: %s' % trapPDU)
 
 ## Send to SNMP trap port.
     snmpClient.snmpTrap( ('localhost', 162), trapPDU )
+
+    if finishat > 0 and lasttime > finishat:
+        sys.exit(0)
 
 # Main bits
 
