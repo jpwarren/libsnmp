@@ -52,7 +52,8 @@ test_octetstrings = [
     'fred',
     'the small frog sat in the well',
     '43 403i 594 5908kjljdfj weljf',
-
+    u'This is a unicode string',
+    u'This is another unicode string',
 ]
 
 test_objectids = {
