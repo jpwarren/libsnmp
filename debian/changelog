@@ -1,3 +1,10 @@
+python-libsnmp (2.0.5-1) feisty; urgency=low
+
+  * Updated build rules to support python 2.5 and remove support for
+    python 2.3 and 2.4. Support for python 2.6 will be introduced soon.
+
+ -- Justin Warren <daedalus@eigenmagic.com>  Tue, 09 Dec 2008 09:30:11 +1100
+
 python-libsnmp (2.0.4-1) feisty; urgency=low
 
   * Fixed minor bug with isinstance parameter ordering in rfc1155.py
