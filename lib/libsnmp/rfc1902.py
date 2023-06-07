@@ -6,12 +6,7 @@
 #
 # SNMPv2 stuff from RFC 1902
 
-import util
-import debug
-import logging
-import types
-
-from rfc1155 import *
+from .rfc1155 import *
 
 log = logging.getLogger('rfc1902')
 
@@ -28,29 +23,34 @@ log.setLevel(logging.INFO)
 # Add a new TagNumber for encoding purposes
 asnTagNumbers['Counter64'] = 0x06
 
+
 class Integer32(Integer):
     """ A 32 bit integer
     """
-    MINVAL = -2147483648L
-    MAXVAL = 2147483648L
+    MINVAL = -2147483648
+    MAXVAL = 2147483648
+
 
 class Counter32(Counter):
     """ A 32 bit counter
     """
     pass
 
+
 class Guage32(Guage):
     """ A 32 bit Guage
     """
     pass
 
+
 class Counter64(Counter):
     """ A 64 bit counter
     """
-    MINVAL = 0L
-    MAXVAL = 18446744073709551615L
+    MINVAL = 0
+    MAXVAL = 18446744073709551615
 
     asnTagClass = asnTagNumbers['Counter64']
+
 
 class OctetString(OctetString):
     """ An SNMP v2 OctetString must be between
@@ -62,6 +62,7 @@ class OctetString(OctetString):
             raise ValueError('OctetString must be shorter than 65535 bytes')
 
         OctetString.__init__(self, value)
+
 
 ## Modify tag decode lookup table to use SNMPv2 classes
 ## instead of the old SNMPv1 classes. Little actual difference

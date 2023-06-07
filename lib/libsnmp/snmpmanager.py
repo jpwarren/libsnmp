@@ -8,20 +8,12 @@
 ## An snmpmanager understands SNMPv1 and SNMPv2c messages
 ## and so it can encode and decode both.
 
-import socket
-import select
 import logging
-import Queue
-import time
-import os
-import asyncore
+import queue
 
-from libsnmp import debug
 from libsnmp import asynrole
-
 from libsnmp import rfc1157
 from libsnmp import rfc1905
-
 from libsnmp import v1
 from libsnmp import v2
 
@@ -38,12 +30,12 @@ typeValDict = {
 
     'c': 0x41,  ## Counter
     'C': 0x46,  ## Counter64
-    
-    }
 
-class snmpManager(asynrole.manager):
+}
 
-    nextRequestID = 0L      # global counter of requestIDs
+
+class snmpManager(asynrole.Manager):
+    nextRequestID = 0  # global counter of requestIDs
 
     def __init__(self, queueEmpty=None, trapCallback=None, interface=('0.0.0.0', 0), timeout=0.25):
         """ Create a new snmpManager bound to interface
@@ -51,14 +43,14 @@ class snmpManager(asynrole.manager):
             of stuff to do. Default is to wait for more stuff.
         """
         self.queueEmpty = queueEmpty
-        self.outbound = Queue.Queue()
+        self.outbound = queue.Queue()
         self.callbacks = {}
 
         # What to do if we get a trap
         self.trapCallback = trapCallback
 
         # initialise as an asynrole manager
-        asynrole.manager.__init__(self, (self.receiveData, None), interface=interface, timeout=timeout )
+        asynrole.Manager.__init__(self, (self.receiveData, None), interface=interface, timeout=timeout)
 
         try:
             # figure out the current system uptime
@@ -79,33 +71,33 @@ class snmpManager(asynrole.manager):
         reqID = self.assignRequestID()
 
         if version == 1:
-            pdu = rfc1157.Get( reqID, varBindList=varbindlist )
+            pdu = rfc1157.Get(reqID, varBindList=varbindlist)
 
         elif version == 2:
-            pdu = rfc1905.Get( reqID, varBindList=varbindlist )            
-            
+            pdu = rfc1905.Get(reqID, varBindList=varbindlist)
+
         return pdu
 
     def createGetNextRequestPDU(self, varbindlist, version=2):
         reqID = self.assignRequestID()
-        
+
         if version == 1:
-            pdu = rfc1157.GetNext( reqID, varBindList=varbindlist )
+            pdu = rfc1157.GetNext(reqID, varBindList=varbindlist)
 
         elif version == 2:
-            pdu = rfc1905.GetNext( reqID, varBindList=varbindlist )
-            
+            pdu = rfc1905.GetNext(reqID, varBindList=varbindlist)
+
         return pdu
 
     def createSetRequestPDU(self, varbindlist, version=2):
         reqID = self.assignRequestID()
 
         if version == 1:
-            pdu = rfc1157.Set( reqID, varBindList=varbindlist )
+            pdu = rfc1157.Set(reqID, varBindList=varbindlist)
 
         elif version == 2:
-            pdu = rfc1905.Set( reqID, varBindList=varbindlist )            
-            
+            pdu = rfc1905.Set(reqID, varBindList=varbindlist)
+
         return pdu
 
     def createGetRequestMessage(self, oid, community='public', version=2):
@@ -115,16 +107,16 @@ class snmpManager(asynrole.manager):
         if version == 1:
             objID = rfc1157.ObjectID(oid)
             val = rfc1157.Null()
-            varbindlist = rfc1157.VarBindList( [ rfc1157.VarBind(objID, val) ] )
-            pdu = self.createGetRequestPDU( varbindlist, 1 )
-            message = rfc1157.Message( community=community, data=pdu )
+            varbindlist = rfc1157.VarBindList([rfc1157.VarBind(objID, val)])
+            pdu = self.createGetRequestPDU(varbindlist, 1)
+            message = rfc1157.Message(community=community, data=pdu)
 
         elif version == 2:
             objID = rfc1905.ObjectID(oid)
             val = rfc1905.Null()
-            varbindlist = rfc1905.VarBindList( [ rfc1905.VarBind(objID, val) ] )
-            pdu = self.createGetRequestPDU( varbindlist, 2 )
-            message = rfc1905.Message( community=community, data=pdu )
+            varbindlist = rfc1905.VarBindList([rfc1905.VarBind(objID, val)])
+            pdu = self.createGetRequestPDU(varbindlist, 2)
+            message = rfc1905.Message(community=community, data=pdu)
 
         else:
             raise ValueError('Unknown version %d' % version)
@@ -135,13 +127,13 @@ class snmpManager(asynrole.manager):
         """ Creates a message object from a pdu and a
             community string.
         """
-        pdu = self.createGetNextRequestPDU( varbindlist, version )
+        pdu = self.createGetNextRequestPDU(varbindlist, version)
 
         if version == 1:
-            return rfc1157.Message( community=community, data=pdu )
+            return rfc1157.Message(community=community, data=pdu)
 
         if version == 2:
-            return rfc1905.Message( community=community, data=pdu )
+            return rfc1905.Message(community=community, data=pdu)
 
     def createSetRequestMessage(self, oid, valtype, value, community='public', version=2):
         """ Creates a message object from a pdu and a
@@ -150,16 +142,16 @@ class snmpManager(asynrole.manager):
         if version == 1:
             objID = rfc1157.ObjectID(oid)
             val = rfc1157.tagDecodeDict[valtype](value)
-            varbindlist = rfc1157.VarBindList( [ rfc1157.VarBind(objID, val) ] )
-            pdu = self.createSetRequestPDU( varbindlist, 1 )
-            message = rfc1157.Message( community=community, data=pdu )
+            varbindlist = rfc1157.VarBindList([rfc1157.VarBind(objID, val)])
+            pdu = self.createSetRequestPDU(varbindlist, 1)
+            message = rfc1157.Message(community=community, data=pdu)
 
         elif version == 2:
             objID = rfc1905.ObjectID(oid)
             val = rfc1905.tagDecodeDict[valtype](value)
-            varbindlist = rfc1905.VarBindList( [ rfc1905.VarBind(objID, val) ] )
-            pdu = self.createSetRequestPDU( varbindlist, 1 )
-            message = rfc1905.Message( community=community, data=pdu )
+            varbindlist = rfc1905.VarBindList([rfc1905.VarBind(objID, val)])
+            pdu = self.createSetRequestPDU(varbindlist, 1)
+            message = rfc1905.Message(community=community, data=pdu)
 
         else:
             raise ValueError('Unknown version %d' % version)
@@ -171,11 +163,12 @@ class snmpManager(asynrole.manager):
             community string.
         """
         if version == 1:
-            return v1.createTrapMessage( community=community, data=pdu )
+            return v1.createTrapMessage(community=community, data=pdu)
         elif version == 2:
-            return v2.createTrapMessage( community=community, data=pdu )
+            return v2.createTrapMessage(community=community, data=pdu)
 
-    def createTrapPDU(self, varbindlist, version=2, enterprise='.1.3.6.1.4', agentAddr=None, genericTrap=6, specificTrap=0):
+    def createTrapPDU(self, varbindlist, version=2, enterprise='.1.3.6.1.4', agentAddr=None, genericTrap=6,
+                      specificTrap=0):
         """ Creates a Trap PDU object from a list of strings and integers
             along with a varBindList to make it a bit easier to build a Trap.
         """
@@ -188,19 +181,19 @@ class snmpManager(asynrole.manager):
             agent = rfc1157.NetworkAddress(agentAddr)
             gTrap = rfc1157.GenericTrap(genericTrap)
             sTrap = rfc1157.Integer(specificTrap)
-            ts = rfc1157.TimeTicks( self.getSysUptime() )
+            ts = rfc1157.TimeTicks(self.getSysUptime())
             pdu = rfc1157.TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
-#        log.debug('v1.trap is %s' % pdu)
+        #        log.debug('v1.trap is %s' % pdu)
 
         elif version == 2:
             ent = rfc1905.ObjectID(enterprise)
             agent = rfc1905.NetworkAddress(agentAddr)
             gTrap = rfc1157.GenericTrap(genericTrap)
             sTrap = rfc1905.Integer(specificTrap)
-            ts = rfc1905.TimeTicks( self.getSysUptime() )
+            ts = rfc1905.TimeTicks(self.getSysUptime())
             pdu = rfc1157.TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
             pass
-        
+
         return pdu
 
     def snmpGet(self, oid, remote, callback, community='public', version=2):
@@ -209,10 +202,10 @@ class snmpManager(asynrole.manager):
             remote is a tuple of (host, port)
             oid is a dotted string eg: .1.2.6.1.0.1.1.3.0
         """
-        msg = self.createGetRequestMessage( oid, community, version )
+        msg = self.createGetRequestMessage(oid, community, version)
 
         # add this message to the outbound queue as a tuple
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
         # Add the callback to my dictionary with the requestID
         # as the key for later retrieval
         self.callbacks[msg.data.requestID] = callback
@@ -225,10 +218,10 @@ class snmpManager(asynrole.manager):
             have either built a varbindlist yourself or just pass
             one in that was previously returned by an snmpGet or snmpGetNext
         """
-        msg = self.createGetNextRequestMessage( varbindlist, community, version )
+        msg = self.createGetNextRequestMessage(varbindlist, community, version)
 
         # add this message to the outbound queue as a tuple
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
         # Add the callback to my dictionary with the requestID
         # as the key for later retrieval
         self.callbacks[msg.data.requestID] = callback
@@ -242,10 +235,10 @@ class snmpManager(asynrole.manager):
         varbindlist for message creation.
         valtype should be a tagDecodeDict key
         """
-        msg = self.createSetRequestMessage( oid, valtype, value, community, version )
+        msg = self.createSetRequestMessage(oid, valtype, value, community, version)
 
         # add this message to the outbound queue as a tuple
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
         # Add the callback to my dictionary with the requestID
         # as the key for later retrieval
         self.callbacks[msg.data.requestID] = callback
@@ -256,15 +249,14 @@ class snmpManager(asynrole.manager):
         """
         msg = self.createTrapMessage(trapPDU, community, version)
 
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
 
-
-    def receiveData(self, manager, cb_ctx, (data, src), (exc_type, exc_value, exc_traceback) ):
+    def receiveData(self, manager, cb_ctx, xxx_todo_changeme, xxx_todo_changeme1):
         """ This method should be called when data is received
             from a remote host.
         """
-
-        # Exception handling
+        (data, src) = xxx_todo_changeme
+        (exc_type, exc_value, exc_traceback) = xxx_todo_changeme1
         if exc_type is not None:
             raise exc_type(exc_value)
 
@@ -277,16 +269,16 @@ class snmpManager(asynrole.manager):
 
         # Decode it based on what version of message it is
         if msg.version == 0:
-#            if __debug__: log.debug('Detected SNMPv1 message')
+            #            if __debug__: log.debug('Detected SNMPv1 message')
             self.handleV1Message(msg)
 
         elif msg.version == 1:
-#            if __debug__: log.debug('Detected SNMPv2 message')
+            #            if __debug__: log.debug('Detected SNMPv2 message')
             self.handleV2Message(msg)
 
         else:
             log.error('Unknown message version %d detected' % msg.version)
-            log.error('version is a %s' % msg.version() )
+            log.error('version is a %s' % msg.version())
             raise ValueError('Unknown message version %d detected' % msg.version)
 
     def handleV1Message(self, msg):
@@ -339,9 +331,9 @@ class snmpManager(asynrole.manager):
 
                 # send any pending outbound messages
                 request = self.outbound.get(0)
-                self.send( request[0].encode(), request[1] )
+                self.send(request[0].encode(), request[1])
 
-            except Queue.Empty:
+            except queue.Empty:
                 if self.queueEmpty:
                     self.queueEmpty(self)
                 pass
