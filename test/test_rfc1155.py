@@ -60,21 +60,21 @@ class EncoderTest(unittest.TestCase):
         f = rfc1155.ObjectID().decode(a.encode())[0]
         g = rfc1155.Asn1Object().decode(a.encode())[0]        
         
-        self.assertEquals(a, a)
-        self.assertEquals(a, b)
-        self.assertEquals(a, c)
-        self.assertEquals(a, d)
-        self.assertNotEquals(a, e)
-        self.assertEquals(a, f)
-        self.assertEquals(a, g)        
+        self.assertEqual(a, a)
+        self.assertEqual(a, b)
+        self.assertEqual(a, c)
+        self.assertEqual(a, d)
+        self.assertNotEqual(a, e)
+        self.assertEqual(a, f)
+        self.assertEqual(a, g)        
         
-        self.assertEquals(b, a)
-        self.assertEquals(b, b)
-        self.assertEquals(b, c)
-        self.assertEquals(b, d)
-        self.assertNotEquals(b, e)        
-        self.assertEquals(b, f)
-        self.assertEquals(b, g)        
+        self.assertEqual(b, a)
+        self.assertEqual(b, b)
+        self.assertEqual(b, c)
+        self.assertEqual(b, d)
+        self.assertNotEqual(b, e)        
+        self.assertEqual(b, f)
+        self.assertEqual(b, g)        
         
         pass
 
@@ -101,7 +101,7 @@ class EncoderTest(unittest.TestCase):
             a = rfc1155.IPAddress(input)
             raw = a.encode()
             b = rfc1155.Asn1Object().decode(raw)[0]
-            self.assertEquals(a,b)
+            self.assertEqual(a,b)
             pass
         return
     
@@ -121,11 +121,11 @@ class EncoderTest(unittest.TestCase):
         d = rfc1155.ObjectID(input_d)
         e = rfc1155.ObjectID('.1.3')
         
-        self.assertEquals(len(a), len(input_a))
-        self.assertEquals(len(b), len(input_a))
-        self.assertEquals(len(c), len(input_a))
-        self.assertEquals(len(d), len(input_a))
-        self.assertNotEquals(len(b), len(e))
+        self.assertEqual(len(a), len(input_a))
+        self.assertEqual(len(b), len(input_a))
+        self.assertEqual(len(c), len(input_a))
+        self.assertEqual(len(d), len(input_a))
+        self.assertNotEqual(len(b), len(e))
         
         return
     
