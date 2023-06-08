@@ -39,14 +39,14 @@ jobs:
         cd test && python -m unittest
 
   py34:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.4
       uses: actions/setup-python@v3
       with:
-        python-version: "3.4"
+        python-version: "3.4.10"
     - name: Test with unittest
       run: |
         cd test && python -m unittest

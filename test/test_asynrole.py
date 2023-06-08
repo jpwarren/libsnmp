@@ -15,7 +15,7 @@ class TestManager(unittest.TestCase):
         self.interface = ('0.0.0.0', 0)
         self.timeout = 0.25
 
-        self.manager = Manager(self.cb_fun, self.cb_ctx, self.dst, self.interface, self.timeout)
+        self.manager = Manager((self.cb_fun, self.cb_ctx), self.dst, self.interface, self.timeout)
 
     def tearDown(self):
         pass
@@ -28,7 +28,7 @@ class TestManager(unittest.TestCase):
 
     def test_init_invalid_callback_function(self):
         with self.assertRaises(ValueError):
-            Manager(None, self.cb_ctx, self.dst, self.interface, self.timeout)
+            Manager((None, self.cb_ctx), self.dst, self.interface, self.timeout)
 
     def test_send(self):
         req = MagicMock()
@@ -43,7 +43,7 @@ class TestManager(unittest.TestCase):
         self.manager.manager.read = MagicMock(return_value=(response, src))
         self.manager.cb_fun = MagicMock()
         self.manager.handle_read()
-        self.manager.cb_fun.assert_called_once_with(self.manager, self.cb_ctx, response, src, None, None, None)
+        self.manager.cb_fun.assert_called_once_with(self.manager, self.cb_ctx, (response, src), (None, None, None))
 
     def test_writable(self):
         self.assertEqual(self.manager.writable(), 0)
@@ -62,7 +62,7 @@ class TestManager(unittest.TestCase):
         exc_traceback = MagicMock()
         self.manager.cb_fun = MagicMock()
         self.manager.handle_error(exc_type, exc_value, exc_traceback)
-        self.manager.cb_fun.assert_called_once_with(self.manager, self.cb_ctx, None, None, exc_type, exc_value, exc_traceback)
+        self.manager.cb_fun.assert_called_once_with(self.manager, self.cb_ctx, (None, None), (exc_type, exc_value, exc_traceback))
 
     def test_handle_error_other_errors(self):
         exc_type = RuntimeError

@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import MagicMock
-from libsnmp import rfc1157, rfc1905, v1, v2
+
+from libsnmp import rfc1157
 from libsnmp.rfc1155 import ObjectID
 from libsnmp.snmpmanager import snmpManager
 
