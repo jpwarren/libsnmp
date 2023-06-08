@@ -5,7 +5,7 @@ name: Python application
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "*" ]
   pull_request:
     branches: [ "master" ]
 
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  py310:
 
     runs-on: ubuntu-latest
 
@@ -34,6 +34,19 @@ jobs:
 #         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 #         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
 #         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Test with unittest
+      run: |
+        cd test && python -m unittest
+
+  py34:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.4
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.4"
     - name: Test with unittest
       run: |
         cd test && python -m unittest
