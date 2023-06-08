@@ -6,38 +6,31 @@
 #
 # SNMPv2 related functions
 
-#import socket
-#import select
-import logging
-#import Queue
-#import time
-#import os
-#import asyncore
 
+import logging
 import traceback
 
-from libsnmp import debug
 from libsnmp import rfc1155
 from libsnmp import rfc1157
-from libsnmp import rfc1902
 from libsnmp import rfc1905
-#from libsnmp import asynrole
-
 from libsnmp import v1
+
+
 log = logging.getLogger('v2.SNMP')
 
 log.setLevel(logging.INFO)
+
 
 class SNMP(v1.SNMP):
 
     def createGetRequestPDU(self, varbindlist):
         reqID = self.assignRequestID()
-        pdu = rfc1905.Get( reqID, varBindList=varbindlist )
+        pdu = rfc1905.Get(reqID, varBindList=varbindlist)
         return pdu
 
     def createGetNextRequestPDU(self, varbindlist):
         reqID = self.assignRequestID()
-        pdu = rfc1905.GetNext( reqID, varBindList=varbindlist )
+        pdu = rfc1905.GetNext(reqID, varBindList=varbindlist)
         return pdu
 
     def createGetRequestMessage(self, oidlist, community='public'):
@@ -50,24 +43,24 @@ class SNMP(v1.SNMP):
         for oid in oidlist:
             objID = rfc1155.ObjectID(oid)
             val = rfc1155.Null()
-            varbinds.append( rfc1157.VarBind(objID, val) )
+            varbinds.append(rfc1157.VarBind(objID, val))
             pass
-        varbindlist = rfc1905.VarBindList( varbinds )
-        pdu = self.createGetRequestPDU( varbindlist )
-        return rfc1905.Message( community=community, data=pdu )
+        varbindlist = rfc1905.VarBindList(varbinds)
+        pdu = self.createGetRequestPDU(varbindlist)
+        return rfc1905.Message(community=community, data=pdu)
 
     def createGetNextRequestMessage(self, varbindlist, community='public'):
         """ Creates a message object from a pdu and a
             community string.
         """
-        pdu = self.createGetNextRequest( varbindlist )
-        return rfc1905.Message( community=community, data=pdu )
+        pdu = self.createGetNextRequest(varbindlist)
+        return rfc1905.Message(community=community, data=pdu)
 
     def createTrapMessage(self, pdu, community='public'):
         """ Creates a message object from a pdu and a
             community string.
         """
-        return rfc1905.Message( community=community, data=pdu )
+        return rfc1905.Message(community=community, data=pdu)
 
     def createTrap(self, varbindlist, enterprise='.1.3.6.1.4', agentAddr=None, genericTrap=6, specificTrap=0):
         """ Creates a Trap PDU object from a list of strings and integers
@@ -79,7 +72,7 @@ class SNMP(v1.SNMP):
         agent = rfc1155.NetworkAddress(agentAddr)
         gTrap = rfc1157.GenericTrap(genericTrap)
         sTrap = rfc1155.Integer(specificTrap)
-        ts = rfc1155.TimeTicks( self.getSysUptime() )
+        ts = rfc1155.TimeTicks(self.getSysUptime())
 
         pdu = rfc1157.TrapPDU(ent, agent, gTrap, sTrap, ts, varbindlist)
         return pdu
@@ -90,11 +83,11 @@ class SNMP(v1.SNMP):
             remote is a tuple of (host, port)
             oid is a dotted string eg: .1.2.6.1.0.1.1.3.0
         """
-        msg = self.createGetRequestMessage( oid, community )
+        msg = self.createGetRequestMessage(oid, community)
         # log.debug('sending message: %s' % msg)
 
         # add this message to the outbound queue as a tuple
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
         # Add the callback to my dictionary with the requestID
         # as the key for later retrieval
         self.callbacks[int(msg.data.requestID)] = callback
@@ -106,10 +99,10 @@ class SNMP(v1.SNMP):
             have either built a varbindlist yourself or just pass
             one in that was previously returned by an snmpGet or snmpGetNext
         """
-        msg = self.createGetNextRequestMessage( varbindlist, community )
+        msg = self.createGetNextRequestMessage(varbindlist, community)
 
         # add this message to the outbound queue as a tuple
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
         # Add the callback to my dictionary with the requestID
         # as the key for later retrieval
         self.callbacks[int(msg.data.requestID)] = callback
@@ -123,11 +116,11 @@ class SNMP(v1.SNMP):
 
         """
         reqID = self.assignRequestID()
-        pdu = rfc1157.GetNextRequestPDU( reqID, varBindList=varbindlist )
-        msg = rfc1905.Message( community=community, data=pdu )
+        pdu = rfc1157.GetNextRequestPDU(reqID, varBindList=varbindlist)
+        msg = rfc1905.Message(community=community, data=pdu)
 
         # add this message to the outbound queue as a tuple
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
         # Add the callback to my dictionary with the requestID
         # as the key for later retrieval
         self.callbacks[int(msg.data.requestID)] = callback
@@ -138,18 +131,19 @@ class SNMP(v1.SNMP):
         """
         msg = self.createTrapMessage(trapPDU, community)
 
-        self.outbound.put( (msg, remote) )
+        self.outbound.put((msg, remote))
 
     def createSetRequestMessage(self, varBindList, community='public'):
         """ Creates a message object from a pdu and a
             community string.
         """
 
-    def receiveData(self, manager, cb_ctx, (data, src), (exc_type, exc_value, exc_traceback) ):
+    def receiveData(self, manager, cb_ctx, data_src_tuple, exc_tuple):
         """ This method should be called when data is received
             from a remote host.
         """
-        # Exception handling
+        (data, src) = data_src_tuple
+        (exc_type, exc_value, exc_traceback) = exc_tuple
         if exc_type is not None:
             raise exc_type(exc_value)
 
@@ -170,12 +164,12 @@ class SNMP(v1.SNMP):
 
             else:
                 log.error('Unknown message version %d detected' % msg.version)
-                log.error('version is a %s' % msg.version() )
+                log.error('version is a %s' % msg.version())
                 raise ValueError('Unknown message version %d detected' % msg.version)
 
             # Figure out what kind of PDU the message contains
             if isinstance(msg.data, rfc1157.PDU):
-#               if __debug__: log.debug('response to requestID: %d' % msg.data.requestID)
+                #               if __debug__: log.debug('response to requestID: %d' % msg.data.requestID)
                 self.callbacks[int(msg.data.requestID)](self, msg)
 
                 # remove the callback from my list once it's done
@@ -189,8 +183,8 @@ class SNMP(v1.SNMP):
                 log.debug('Unknown message type')
 
         # log any errors in callback
-        except Exception, e:
-#            log.error('Exception in callback: %s: %s' % (self.callbacks[int(msg.data.requestID)].__name__, e) )
-            log.error('Exception in receiveData: %s' % e )
+        except Exception as e:
+            #            log.error('Exception in callback: %s: %s' % (self.callbacks[int(msg.data.requestID)].__name__, e) )
+            log.error('Exception in receiveData: %s' % e)
             traceback.print_exc()
-            #raise
+            # raise

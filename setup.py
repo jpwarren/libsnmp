@@ -10,9 +10,9 @@ from setuptools import setup
 
 import time
 
-version_major = 2
+version_major = 3
 version_minor = 0
-version_build = 5
+version_build = 0
 version_devel=''
 #version_devel='-dev-' + time.strftime('%Y-%m-%d-%H%M')
 

@@ -6,11 +6,8 @@
 #
 # SNMPv2 protocol parts
 
-import logging
-import debug
-
-import rfc1157
-from rfc1902 import *
+from . import rfc1157
+from .rfc1902 import *
 
 log = logging.getLogger('rfc1905')
 
@@ -19,46 +16,55 @@ asnTagNumbers['Inform'] = 0x06
 asnTagNumbers['TrapV2'] = 0x07
 asnTagNumbers['Report'] = 0x08
 
-max_bindings = 2147483647L
+max_bindings = 2147483647
+
 
 class VarBind(rfc1157.VarBind):
     """ VarBind redefined here to place it in the same namespace
     """
     pass
 
+
 ## We need to add some special types because ucd-snmp uses
 ## context specific values for the CHOICE within a VarBind
 class NoSuchObject(rfc1157.Null):
 
     def __str__(self):
-        return('No Such Object')
+        return ('No Such Object')
+
 
 class NoSuchInstance(rfc1157.Null):
 
     def __str__(self):
-        return('No Such Instance')
+        return ('No Such Instance')
+
 
 class EndOfMibView(rfc1157.Null):
 
     def __str__(self):
-        return('EndOfMibView')
+        return ('EndOfMibView')
+
 
 class VarBindList(rfc1157.VarBindList):
     """ An SNMPv2 VarBindList has a maximum size of max_bindings
     """
+
     def __init__(self, value=[]):
         if len(value) > max_bindings:
             raise ValueError('A VarBindList must be shorter than %d' % max_bindings)
         rfc1157.VarBindList.__init__(self, value)
+
 
 class Message(rfc1157.Message):
 
     def __init__(self, version=1, community='public', data=None):
         rfc1157.Message.__init__(self, version, community, data)
 
+
 class ErrorStatus(rfc1157.ErrorStatus):
     """ An SNMPv2 Error status
     """
+
     def __init__(self, value):
         rfc1157.ErrorStatus.__init__(self, value)
         # add to the SNMPv1 error strings
@@ -90,6 +96,7 @@ class ErrorStatus(rfc1157.ErrorStatus):
         self.errNum[17] = 'notWritable'
         self.errNum[18] = 'inconsistentName'
 
+
 class PDU(rfc1157.PDU):
     """ SNMPv2 PDUs are very similar to SNMPv1 PDUs
     """
@@ -112,6 +119,7 @@ class PDU(rfc1157.PDU):
             self.errorIndex,
             self.varBindList,
         ]
+
 
 #    def decodeContents(self, stream):
 #        """ Decode into a PDU object
@@ -158,57 +166,68 @@ class BulkPDU(Sequence):
         """
         objectList = Sequence.decodeContents(self, stream)
         if len(self.value) != 4:
-            raise PDUError('Malformed BulkPDU: Incorrect length %d' % len(self.value) )
+            raise PDUError('Malformed BulkPDU: Incorrect length %d' % len(self.value))
 
         # Build things with the correct types
+        myVarList = []
         for item in objectList[3]:
-            myVarList.append( VarBind(item[0], item[1]) )
+            myVarList.append(VarBind(item[0], item[1]))
 
-        return self.__class__( int(objectList[0]), int(objectList[1]), int(objectList[2]), myVarList)
+        return self.__class__(int(objectList[0]), int(objectList[1]), int(objectList[2]), myVarList)
+
 
 class Get(PDU):
     """ An SNMPv2 Get Request PDU
     """
     asnTagNumber = asnTagNumbers['Get']
 
+
 class GetNext(PDU):
     """ An SNMPv2 Get Next Request PDU
     """
     asnTagNumber = asnTagNumbers['GetNext']
+
 
 class Response(PDU):
     """ An SNMPv2 Response PDU
     """
     asnTagNumber = asnTagNumbers['Response']
 
+
 class Set(PDU):
     """ An SNMPv2 Set Request PDU
     """
     asnTagNumber = asnTagNumbers['Set']
+
 
 class GetBulk(BulkPDU):
     """ An SNMPv2 Get Next Request PDU
     """
     asnTagNumber = asnTagNumbers['GetBulk']
 
+
 class Inform(PDU):
     """ An SNMPv2 Get Next Request PDU
     """
     asnTagNumber = asnTagNumbers['Inform']
+
 
 class TrapV2(PDU):
     """ An SNMPv2 Trap PDU
     """
     asnTagNumber = asnTagNumbers['TrapV2']
 
+
 class Report(PDU):
     """ An SNMPv2 Report PDU
     """
     asnTagNumber = asnTagNumbers['Report']
 
+
 class PDUError(Exception):
     def __init__(self, args=None):
         self.args = args
+
 
 ## Add some new decode types
 
