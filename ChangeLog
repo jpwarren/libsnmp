@@ -1,3 +1,6 @@
+2023-06-09  Justin Warren <daedalus@eigenmagic.com>
+    * Upgrade to support Python 3.x thanks to Jay Zhou
+
 2007-04-11  Justin Warren <daedalus@eigenmagic.com>
 	* Minor bugfix in rfc1905.py after feedback from Phil Mayers
 	* Changed example scripts to use any available python, not just 2.3

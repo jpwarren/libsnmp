@@ -22,8 +22,10 @@ lib/libsnmp/v2.py
 lib/libsnmp/snmpmanager.py
 lib/libsnmp/role.py
 lib/libsnmp/asynrole.py
-test/test_Messages.py
+test/test_asynrole.py
 test/test_encoder.py
+test/test_Messages.py
 test/test_rfc1157.py
 test/test_rfc1155.py
+test/test_snmpmanager.py
 test/test_svt_encoder.py

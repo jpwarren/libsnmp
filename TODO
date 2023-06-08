@@ -1,8 +1,5 @@
-# $Id$
-# $Revision$
-#
 #    libsnmp - a Python SNMP library
-#    Copyright (C) 2003 Unicity Pty Ltd <libsnmp@unicity.com.au>
+#    Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 #
 #    This library is free software; you can redistribute it and/or
 #    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +15,3 @@
 #    License along with this library; if not, write to the Free Software
 #    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-- Add more unittests to test all scenarios. This will form the core of
-  the regression test suite.
-- Modify snmpmanager.py to use v1 and v2 instead of directly using
-  the rfc11*.py code.
