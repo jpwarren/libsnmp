@@ -138,12 +138,12 @@ class SNMP(v1.SNMP):
             community string.
         """
 
-    def receiveData(self, manager, cb_ctx, xxx_todo_changeme, xxx_todo_changeme1):
+    def receiveData(self, manager, cb_ctx, data_src_tuple, exc_tuple):
         """ This method should be called when data is received
             from a remote host.
         """
-        (data, src) = xxx_todo_changeme
-        (exc_type, exc_value, exc_traceback) = xxx_todo_changeme1
+        (data, src) = data_src_tuple
+        (exc_type, exc_value, exc_traceback) = exc_tuple
         if exc_type is not None:
             raise exc_type(exc_value)
 

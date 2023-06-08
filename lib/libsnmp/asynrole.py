@@ -12,9 +12,9 @@ from libsnmp import role
 
 class Manager(asyncore.dispatcher):
 
-    def __init__(self, xxx_todo_changeme, dst=(None, 0), interface=('0.0.0.0', 0), timeout=0.25):
+    def __init__(self, callback_tuple, dst=(None, 0), interface=('0.0.0.0', 0), timeout=0.25):
 
-        (cb_fun, cb_ctx) = xxx_todo_changeme
+        (cb_fun, cb_ctx) = callback_tuple
         if not callable(cb_fun):
             raise ValueError('Non-callable callback function')
 
