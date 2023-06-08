@@ -1,7 +1,5 @@
 #!/usr/bin/python
-# $Id$
-# $Revision$
-#
+
 #    libsnmp - a Python SNMP library
 #    Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>
 
@@ -39,8 +37,7 @@ setup(
     author='Justin Warren',
     author_email='daedalus@eigenmagic.com',
     license='MIT',
-    url='http://www.eigenmagic.com',
-    download_url='http://www.seafelt.com/software/sources',
+    url='https://github.com/jpwarren/libsnmp',
 
     classifiers = [
     "Development Status :: 5 - Production/Stable",

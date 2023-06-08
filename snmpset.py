@@ -1,6 +1,4 @@
-#!/usr/bin/env python2.3
-# $Id$
-# $Revision$
+#!/usr/bin/env python
 #
 #    libsnmp - a Python SNMP library
 #    Copyright (c) 2003 Justin Warren <daedalus@eigenmagic.com>

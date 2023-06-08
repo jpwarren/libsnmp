@@ -1,0 +1,37 @@
+[project]
+name = "libsnmp"
+version = "3.0.0"
+description = "A pure Python implementation of the Simple Network Management Protocol"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.0"
+keywords = ["SNMP", "library"]
+authors = [ 
+    {name = "Justin Warren"}, {email = "daedalus@eigenmagic.com"}
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Communications",
+    "Topic :: Internet",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Networking :: Monitoring",
+]
+
+[project.urls]
+homepage = "https://github.com/jpwarren/libsnmp"
+documentation = "https://github.com/jpwarren/libsnmp"
+repository = "https://github.com/jpwarren/libsnmp"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]

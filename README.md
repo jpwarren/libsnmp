@@ -1,5 +1,6 @@
 # libsnmp
-A pure Python SNMP library
+
+A pure Python implementation of the Simple Network Management Protocol as a Python library.
 
 ## Overview
 
@@ -13,6 +14,7 @@ The code is here mostly for historical reference, and so people who keep downloa
 unknown reasons can fork and update the code if they so wish.
 
 ## Installation
+
 libsnmp is available in PyPI, so you can just use:
 
 ```
